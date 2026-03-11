@@ -14,6 +14,8 @@ class _TambahBatchState extends State<TambahBatch> {
   TextEditingController hargaController = TextEditingController();
   TextEditingController kadarAirController = TextEditingController();
 
+  String? selectedNamaBarang;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,6 +36,8 @@ class _TambahBatchState extends State<TambahBatch> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              SizedBox(height: 5),
+
               Text(
                 "Tanggal Beli",
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
@@ -75,6 +79,39 @@ class _TambahBatchState extends State<TambahBatch> {
                 decoration: InputDecoration(
                   hintText: 'Masukkan nama supplier',
                   border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 10),
+
+              Text(
+                "Nama Barang",
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 5),
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: DropdownButton<String>(
+                  value: null,
+                  hint: Text('Pilih nama barang', style: TextStyle(color: Colors.grey.shade900),),
+                  isExpanded: true,
+                  underline: SizedBox(),
+                  items: <String>['Mangkok', 'Kipas', 'Segitiga', 'Kaki', 'Patahan', 'Serat', 'Bulu']
+                      .map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedNamaBarang = newValue;
+                    });
+                  },
                 ),
               ),
               SizedBox(height: 10),
@@ -129,138 +166,148 @@ class _TambahBatchState extends State<TambahBatch> {
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 5),
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(5),
-                  color: Colors.grey[200],
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Mangkok"),
-                      SizedBox(height: 5),
-                      Text("A"),
-                      SizedBox(height: 5),
-                      Text("B"),
-                      SizedBox(height: 5),
-                      Text("C"),
-                      SizedBox(height: 5),
-                    ],
+
+              if (selectedNamaBarang != null) ...[
+                if (selectedNamaBarang == 'Mangkok') ... [
+                  Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(5),
+                    color: Colors.grey[200],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Mangkok"),
+                        SizedBox(height: 5),
+                        Text("A"),
+                        SizedBox(height: 5),
+                        Text("B"),
+                        SizedBox(height: 5),
+                        Text("C"),
+                        SizedBox(height: 5),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(height: 5),
-
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(5),
-                  color: Colors.grey[200],
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Kipas"),
-                      SizedBox(height: 5),
-                      Text("A"),
-                      SizedBox(height: 5),
-                      Text("B"),
-                      SizedBox(height: 5),
-                      Text("C"),
-                      SizedBox(height: 5),
-                    ],
+                SizedBox(height: 5),
+                ]
+                else if (selectedNamaBarang == 'Kipas') ... [
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(5),
+                    color: Colors.grey[200],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Kipas"),
+                        SizedBox(height: 5),
+                        Text("A"),
+                        SizedBox(height: 5),
+                        Text("B"),
+                        SizedBox(height: 5),
+                        Text("C"),
+                        SizedBox(height: 5),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(height: 5),
-
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(5),
-                  color: Colors.grey[200],
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Segitiga"),
-                      SizedBox(height: 5),
-                      Text("A"),
-                      SizedBox(height: 5),
-                      Text("B"),
-                    ],
+                SizedBox(height: 5),
+                ]
+                else if (selectedNamaBarang == 'Segitiga') ... [
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(5),
+                    color: Colors.grey[200],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Segitiga"),
+                        SizedBox(height: 5),
+                        Text("A"),
+                        SizedBox(height: 5),
+                        Text("B"),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(height: 5,),
-
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(5),
-                  color: Colors.grey[200],
+                SizedBox(height: 5,),
+                ]
+                else if (selectedNamaBarang == 'Kaki') ... [
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(5),
+                    color: Colors.grey[200],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Text("Kaki")
+                  ),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Text("Kaki")
+                SizedBox(height: 5,),
+                ]
+                else if (selectedNamaBarang == 'Patahan') ... [
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(5),
+                    color: Colors.grey[200],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Text("Patahan")
+                  ),
                 ),
-              ),
-              SizedBox(height: 5,),
-
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(5),
-                  color: Colors.grey[200],
+                SizedBox(height: 5,),
+                ]
+                else if (selectedNamaBarang == 'Serat') ... [
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(5),
+                    color: Colors.grey[200],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Text("Serat")
+                  ),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Text("Patahan")
+                SizedBox(height: 5,),
+                ]
+                else if (selectedNamaBarang == 'Bulu') ... [
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(5),
+                    color: Colors.grey[200],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Text("Bulu")
+                  ),
                 ),
-              ),
-              SizedBox(height: 5,),
-
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(5),
-                  color: Colors.grey[200],
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Text("Serat")
-                ),
-              ),
-              SizedBox(height: 5,),
-
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(5),
-                  color: Colors.grey[200],
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Text("BUlu")
-                ),
-              ),
-              SizedBox(height: 5,),
-
-              
+                SizedBox(height: 5,),
+                ]
+              ],
+              SizedBox(height: 10),
             ],
           ),
         ),
