@@ -55,7 +55,7 @@ class _DashboardState extends State<Dashboard> {
                 ),
               ),
               ElevatedButton(onPressed: () {
-                Navigator.pushReplacement(
+                Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => TambahBatch()),
                 );

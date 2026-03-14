@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/services/add_batch.dart';
 
 class TambahBatch extends StatefulWidget {
   const TambahBatch({super.key});
@@ -96,17 +97,28 @@ class _TambahBatchState extends State<TambahBatch> {
                   borderRadius: BorderRadius.circular(5),
                 ),
                 child: DropdownButton<String>(
-                  value: null,
-                  hint: Text('Pilih nama barang', style: TextStyle(color: Colors.grey.shade900),),
+                  value: selectedNamaBarang,
+                  hint: Text(
+                    'Pilih nama barang',
+                    style: TextStyle(color: Colors.grey.shade900),
+                  ),
                   isExpanded: true,
                   underline: SizedBox(),
-                  items: <String>['Mangkok', 'Kipas', 'Segitiga', 'Kaki', 'Patahan', 'Serat', 'Bulu']
-                      .map((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
+                  items:
+                      <String>[
+                        'Mangkok',
+                        'Kipas',
+                        'Segitiga',
+                        'Kaki',
+                        'Patahan',
+                        'Serat',
+                        'Bulu',
+                      ].map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
                   onChanged: (String? newValue) {
                     setState(() {
                       selectedNamaBarang = newValue;
@@ -168,146 +180,345 @@ class _TambahBatchState extends State<TambahBatch> {
               SizedBox(height: 5),
 
               if (selectedNamaBarang != null) ...[
-                if (selectedNamaBarang == 'Mangkok') ... [
+                if (selectedNamaBarang == 'Mangkok') ...[
                   Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(5),
-                    color: Colors.grey[200],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Mangkok"),
-                        SizedBox(height: 5),
-                        Text("A"),
-                        SizedBox(height: 5),
-                        Text("B"),
-                        SizedBox(height: 5),
-                        Text("C"),
-                        SizedBox(height: 5),
-                      ],
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(5),
+                      color: Colors.grey[200],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Mangkok"),
+                          SizedBox(height: 5),
+                          Row(
+                            children: [
+                              Text("A: "),
+                              SizedBox(width: 5),
+                              Expanded(
+                                child: TextFormField(
+                                  decoration: InputDecoration(
+                                    hintText: 'Masukkan berat (kg)',
+                                    border: OutlineInputBorder(),
+                                    contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 5),
+                          Row(
+                            children: [
+                              Text("B: "),
+                              SizedBox(width: 5),
+                              Expanded(
+                                child: TextFormField(
+                                  decoration: InputDecoration(
+                                    hintText: 'Masukkan berat (kg)',
+                                    border: OutlineInputBorder(),
+                                    contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 5),
+                          Row(
+                            children: [
+                              Text("C: "),
+                              SizedBox(width: 5),
+                              Expanded(
+                                child: TextFormField(
+                                  decoration: InputDecoration(
+                                    hintText: 'Masukkan berat (kg)',
+                                    border: OutlineInputBorder(),
+                                    contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 5),
+                          Row(
+                            children: [
+                              Text("C"),
+                              SizedBox(width: 5),
+                              Expanded(
+                                child: TextFormField(
+                                  decoration: InputDecoration(
+                                    hintText: 'Masukkan berat (kg)',
+                                    border: OutlineInputBorder(),
+                                    contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 5),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(height: 5),
-                ]
-                else if (selectedNamaBarang == 'Kipas') ... [
-                Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(5),
-                    color: Colors.grey[200],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Kipas"),
-                        SizedBox(height: 5),
-                        Text("A"),
-                        SizedBox(height: 5),
-                        Text("B"),
-                        SizedBox(height: 5),
-                        Text("C"),
-                        SizedBox(height: 5),
-                      ],
+                  SizedBox(height: 5),
+                ] else if (selectedNamaBarang == 'Kipas') ...[
+                  Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(5),
+                      color: Colors.grey[200],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Kipas"),
+                          SizedBox(height: 5),
+                          Row(
+                            children: [
+                              Text("A: "),
+                              SizedBox(width: 5),
+                              Expanded(
+                                child: TextFormField(
+                                  decoration: InputDecoration(
+                                    hintText: 'Masukkan berat (kg)',
+                                    border: OutlineInputBorder(),
+                                    contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 5),
+                          Row(
+                            children: [
+                              Text("B: "),
+                              SizedBox(width: 5),
+                              Expanded(
+                                child: TextFormField(
+                                  decoration: InputDecoration(
+                                    hintText: 'Masukkan berat (kg)',
+                                    border: OutlineInputBorder(),
+                                    contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 5),
+                          Row(
+                            children: [
+                              Text("C: "),
+                              SizedBox(width: 5),
+                              Expanded(
+                                child: TextFormField(
+                                  decoration: InputDecoration(
+                                    hintText: 'Masukkan berat (kg)',
+                                    border: OutlineInputBorder(),
+                                    contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 5),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(height: 5),
-                ]
-                else if (selectedNamaBarang == 'Segitiga') ... [
-                Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(5),
-                    color: Colors.grey[200],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Segitiga"),
-                        SizedBox(height: 5),
-                        Text("A"),
-                        SizedBox(height: 5),
-                        Text("B"),
-                      ],
+                  SizedBox(height: 5),
+                ] else if (selectedNamaBarang == 'Segitiga') ...[
+                  Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(5),
+                      color: Colors.grey[200],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Segitiga"),
+                          SizedBox(height: 5),
+                          Row(
+                            children: [
+                              Text("A: "),
+                              SizedBox(width: 5),
+                              Expanded(
+                                child: TextFormField(
+                                  decoration: InputDecoration(
+                                    hintText: 'Masukkan berat (kg)',
+                                    border: OutlineInputBorder(),
+                                    contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 5),
+                          Row(
+                            children: [
+                              Text("B: "),
+                              SizedBox(width: 5),
+                              Expanded(
+                                child: TextFormField(
+                                  decoration: InputDecoration(
+                                    hintText: 'Masukkan berat (kg)',
+                                    border: OutlineInputBorder(),
+                                    contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(height: 5,),
-                ]
-                else if (selectedNamaBarang == 'Kaki') ... [
-                Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(5),
-                    color: Colors.grey[200],
+                  SizedBox(height: 5),
+                ] else if (selectedNamaBarang == 'Kaki') ...[
+                  Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(5),
+                      color: Colors.grey[200],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Row(
+                        children: [
+                          Text("Kaki: "),
+                          SizedBox(width: 5),
+                          Expanded(
+                            child: TextFormField(
+                              decoration: InputDecoration(
+                                hintText: 'Masukkan berat (kg)',
+                                border: OutlineInputBorder(),
+                                contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                              ),
+                              keyboardType: TextInputType.number,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Text("Kaki")
+                  SizedBox(height: 5),
+                ] else if (selectedNamaBarang == 'Patahan') ...[
+                  Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(5),
+                      color: Colors.grey[200],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Row(children: [
+                        Text("Patahan: "),
+                        SizedBox(width: 5),
+                        Expanded(
+                          child: TextFormField(
+                            decoration: InputDecoration(
+                              hintText: 'Masukkan berat (kg)',
+                              border: OutlineInputBorder(),
+                              contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            ),
+                            keyboardType: TextInputType.number,
+                          ),
+                        ),
+                        ]),
+                    ),
                   ),
-                ),
-                SizedBox(height: 5,),
-                ]
-                else if (selectedNamaBarang == 'Patahan') ... [
-                Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(5),
-                    color: Colors.grey[200],
+                  SizedBox(height: 5),
+                ] else if (selectedNamaBarang == 'Serat') ...[
+                  Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(5),
+                      color: Colors.grey[200],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Row(
+                        children: [
+                          Text("Serat: "),
+                          SizedBox(width: 5),
+                          Expanded(
+                            child: TextFormField(
+                              decoration: InputDecoration(
+                                hintText: 'Masukkan berat (kg)',
+                                border: OutlineInputBorder(),
+                                contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                              ),
+                              keyboardType: TextInputType.number,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Text("Patahan")
+                  SizedBox(height: 5),
+                ] else if (selectedNamaBarang == 'Bulu') ...[
+                  Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(5),
+                      color: Colors.grey[200],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Row(
+                        children: [
+                          Text("Bulu: "),
+                          SizedBox(width: 5),
+                          Expanded(
+                            child: TextFormField(
+                              decoration: InputDecoration(
+                                hintText: 'Masukkan berat (kg)',
+                                border: OutlineInputBorder(),
+                                contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                              ),
+                              keyboardType: TextInputType.number,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-                SizedBox(height: 5,),
-                ]
-                else if (selectedNamaBarang == 'Serat') ... [
-                Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(5),
-                    color: Colors.grey[200],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Text("Serat")
-                  ),
-                ),
-                SizedBox(height: 5,),
-                ]
-                else if (selectedNamaBarang == 'Bulu') ... [
-                Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(5),
-                    color: Colors.grey[200],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Text("Bulu")
-                  ),
-                ),
-                SizedBox(height: 5,),
-                ]
+                  SizedBox(height: 5),
+                ],
+                SizedBox(height: 20),
               ],
-              SizedBox(height: 10),
+              Center(
+                child: ElevatedButton(
+                  onPressed: () {
+                    addBatch(tanggalBeliController.text, selectedNamaBarang!);
+                    Navigator.pop(context);
+                  },
+                  child: Text('Simpan'),
+                ),
+              ),
+              SizedBox(height: 20),
             ],
           ),
         ),

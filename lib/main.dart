@@ -1,9 +1,15 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/dashboard.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-void main() {
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Supabase.initialize(
+    url: 'https://gcqrglzxeqgphjbuiiab.supabase.co',
+    anonKey: 'sb_publishable_2Jjodc6ghnHOaX3MMCwkWg_aXzX564H',
+  );
   runApp(const MainApp());
 }
 
@@ -25,10 +31,24 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _opacityAnimation;
+
   @override
   void initState() {
     super.initState();
+
+    _controller = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    );
+
+    _opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
+    );
+
+    _controller.forward();
 
     Timer(Duration(seconds: 3), () {
       Navigator.pushReplacement(
@@ -36,6 +56,12 @@ class _SplashScreenState extends State<SplashScreen> {
         MaterialPageRoute(builder: (context) => Dashboard()),
       );
     });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -48,9 +74,17 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset('assets/image/logo.png', width: screenWidth * 0.4, height: screenHeight * 0.4),
+            AnimatedBuilder(
+              animation: _opacityAnimation,
+              builder: (context, child) {
+                return Opacity(
+                  opacity: _opacityAnimation.value,
+                  child: Image.asset('assets/image/logo.png', width: screenWidth * 0.4, height: screenHeight * 0.4),
+                );
+              },
+            ),
             CircularProgressIndicator(color: Colors.blue,),
-            SizedBox(height: 10),
+            SizedBox(height: 5),
             Text('Loading...', style: TextStyle(fontSize: 16, color: Colors.grey)),
           ],
         ),
@@ -58,3 +92,4 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 }
+
