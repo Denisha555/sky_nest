@@ -15,6 +15,19 @@ class _TambahBatchState extends State<TambahBatch> {
   TextEditingController hargaController = TextEditingController();
   TextEditingController kadarAirController = TextEditingController();
 
+  TextEditingController mangkokAController = TextEditingController();
+  TextEditingController mangkokBController = TextEditingController();
+  TextEditingController mangkokCController = TextEditingController();
+  TextEditingController kipasAController = TextEditingController();
+  TextEditingController kipasBController = TextEditingController();
+  TextEditingController kipasCController = TextEditingController();
+  TextEditingController segitigaAController = TextEditingController();
+  TextEditingController segitigaBController = TextEditingController();
+  TextEditingController kakiController = TextEditingController();
+  TextEditingController patahanController = TextEditingController();
+  TextEditingController seratController = TextEditingController();
+  TextEditingController buluController = TextEditingController();
+
   String? selectedNamaBarang;
 
   @override
@@ -201,6 +214,7 @@ class _TambahBatchState extends State<TambahBatch> {
                               SizedBox(width: 5),
                               Expanded(
                                 child: TextFormField(
+                                  controller: mangkokAController,
                                   decoration: InputDecoration(
                                     hintText: 'Masukkan berat (kg)',
                                     border: OutlineInputBorder(),
@@ -218,6 +232,7 @@ class _TambahBatchState extends State<TambahBatch> {
                               SizedBox(width: 5),
                               Expanded(
                                 child: TextFormField(
+                                  controller: mangkokBController,
                                   decoration: InputDecoration(
                                     hintText: 'Masukkan berat (kg)',
                                     border: OutlineInputBorder(),
@@ -235,6 +250,7 @@ class _TambahBatchState extends State<TambahBatch> {
                               SizedBox(width: 5),
                               Expanded(
                                 child: TextFormField(
+                                  controller: mangkokCController,
                                   decoration: InputDecoration(
                                     hintText: 'Masukkan berat (kg)',
                                     border: OutlineInputBorder(),
@@ -252,6 +268,7 @@ class _TambahBatchState extends State<TambahBatch> {
                               SizedBox(width: 5),
                               Expanded(
                                 child: TextFormField(
+                                  controller: mangkokCController,
                                   decoration: InputDecoration(
                                     hintText: 'Masukkan berat (kg)',
                                     border: OutlineInputBorder(),
@@ -289,6 +306,7 @@ class _TambahBatchState extends State<TambahBatch> {
                               SizedBox(width: 5),
                               Expanded(
                                 child: TextFormField(
+                                  controller: kipasAController,
                                   decoration: InputDecoration(
                                     hintText: 'Masukkan berat (kg)',
                                     border: OutlineInputBorder(),
@@ -306,6 +324,7 @@ class _TambahBatchState extends State<TambahBatch> {
                               SizedBox(width: 5),
                               Expanded(
                                 child: TextFormField(
+                                  controller: kipasBController,
                                   decoration: InputDecoration(
                                     hintText: 'Masukkan berat (kg)',
                                     border: OutlineInputBorder(),
@@ -323,6 +342,7 @@ class _TambahBatchState extends State<TambahBatch> {
                               SizedBox(width: 5),
                               Expanded(
                                 child: TextFormField(
+                                  controller: kipasCController,
                                   decoration: InputDecoration(
                                     hintText: 'Masukkan berat (kg)',
                                     border: OutlineInputBorder(),
@@ -360,6 +380,7 @@ class _TambahBatchState extends State<TambahBatch> {
                               SizedBox(width: 5),
                               Expanded(
                                 child: TextFormField(
+                                  controller: segitigaAController,
                                   decoration: InputDecoration(
                                     hintText: 'Masukkan berat (kg)',
                                     border: OutlineInputBorder(),
@@ -377,6 +398,7 @@ class _TambahBatchState extends State<TambahBatch> {
                               SizedBox(width: 5),
                               Expanded(
                                 child: TextFormField(
+                                  controller: segitigaBController,
                                   decoration: InputDecoration(
                                     hintText: 'Masukkan berat (kg)',
                                     border: OutlineInputBorder(),
@@ -408,6 +430,7 @@ class _TambahBatchState extends State<TambahBatch> {
                           SizedBox(width: 5),
                           Expanded(
                             child: TextFormField(
+                              controller: kakiController,
                               decoration: InputDecoration(
                                 hintText: 'Masukkan berat (kg)',
                                 border: OutlineInputBorder(),
@@ -436,6 +459,7 @@ class _TambahBatchState extends State<TambahBatch> {
                         SizedBox(width: 5),
                         Expanded(
                           child: TextFormField(
+                            controller: patahanController,
                             decoration: InputDecoration(
                               hintText: 'Masukkan berat (kg)',
                               border: OutlineInputBorder(),
@@ -464,6 +488,7 @@ class _TambahBatchState extends State<TambahBatch> {
                           SizedBox(width: 5),
                           Expanded(
                             child: TextFormField(
+                              controller: seratController,
                               decoration: InputDecoration(
                                 hintText: 'Masukkan berat (kg)',
                                 border: OutlineInputBorder(),
@@ -493,6 +518,7 @@ class _TambahBatchState extends State<TambahBatch> {
                           SizedBox(width: 5),
                           Expanded(
                             child: TextFormField(
+                              controller: buluController,
                               decoration: InputDecoration(
                                 hintText: 'Masukkan berat (kg)',
                                 border: OutlineInputBorder(),
@@ -512,6 +538,8 @@ class _TambahBatchState extends State<TambahBatch> {
               Center(
                 child: ElevatedButton(
                   onPressed: () {
+                    
+                   
                     addBatch(tanggalBeliController.text, selectedNamaBarang!);
                     Navigator.pop(context);
                   },
