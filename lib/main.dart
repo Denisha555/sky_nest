@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/dashboard.dart';
+import 'package:flutter_application_1/login.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async{
@@ -53,7 +54,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     Timer(Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => Dashboard()),
+        MaterialPageRoute(builder: (context) => Login()),
       );
     });
   }
