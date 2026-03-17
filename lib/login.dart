@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/dashboard.dart';
+import 'package:flutter_application_1/services/add_user.dart';
+import 'package:flutter_application_1/services/check_user.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -9,7 +12,8 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
-  
+  TextEditingController usernameController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -49,19 +53,34 @@ class _LoginState extends State<Login> {
                           children: [
                             Text("Username", style: TextStyle(fontWeight: FontWeight.bold),),
                             TextFormField(
+                              controller: usernameController,
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(),
                                 hintText: "Masukkan Username",
-                              
                               ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Username tidak boleh kosong';
+                                }
+                                return null;
+                              },
                             ),
                             SizedBox(height: 5,),
                             Text("Password", style: TextStyle(fontWeight: FontWeight.bold),),
                             TextFormField(
+                              controller: passwordController,
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(),
                                 hintText: "Masukkan Password",
                               ),
+                              obscureText: true,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Password tidak boleh kosong';
+                                }
+                                return null;
+                              },
+                              
                             ),
                             SizedBox(height: 10,),
                            
@@ -70,8 +89,17 @@ class _LoginState extends State<Login> {
                                 width: double.infinity,
                                 height: 40,
                                 child: ElevatedButton(
-                                  onPressed: () {
-                                    // Implement login logic here
+                                  onPressed: () async {
+                                    if (_formKey.currentState!.validate()) {
+                                      if (await checkUser(usernameController.text, passwordController.text)) {
+                                        Navigator.pushReplacement(context, MaterialPageRoute(builder:(context) => Dashboard(),));
+                                      } else {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text('Login Gagal: Periksa username dan password Anda.')),
+                                        );
+                                      }
+                                    }
+                                    checkUser(usernameController.text, passwordController.text);
                                   },
                                   
                                   style: ElevatedButton.styleFrom(
