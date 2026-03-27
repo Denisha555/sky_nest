@@ -116,7 +116,7 @@ class _LoginState extends State<Login> {
                                               );
                                             }
                                           }
-                                          checkUser(usernameController.text, passwordController.text);
+                                          await checkUser(usernameController.text, passwordController.text);
                                         },
                                         
                                         style: ElevatedButton.styleFrom(

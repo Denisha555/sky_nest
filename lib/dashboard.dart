@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/data_batch.dart';
 import 'package:flutter_application_1/tambah_batch.dart';
 
 class Dashboard extends StatefulWidget {
@@ -60,8 +61,14 @@ class _DashboardState extends State<Dashboard> {
                   MaterialPageRoute(builder: (context) => TambahBatch()),
                 );
               }, 
-              child: const Text('Tambah Batch'))
-              
+              child: const Text('Tambah Batch')),
+              SizedBox(height: 10),
+              ElevatedButton(onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => DataBatch()),
+                );
+              }, child: const Text('Data Batch'))
             ],
           ),
         ),
