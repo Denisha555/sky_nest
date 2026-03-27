@@ -16,18 +16,18 @@ class _TambahBatchState extends State<TambahBatch> {
   TextEditingController hargaController = TextEditingController();
   TextEditingController kadarAirController = TextEditingController();
 
-  TextEditingController mangkokAController = TextEditingController();
-  TextEditingController mangkokBController = TextEditingController();
-  TextEditingController mangkokCController = TextEditingController();
-  TextEditingController kipasAController = TextEditingController();
-  TextEditingController kipasBController = TextEditingController();
-  TextEditingController kipasCController = TextEditingController();
-  TextEditingController segitigaAController = TextEditingController();
-  TextEditingController segitigaBController = TextEditingController();
-  TextEditingController kakiController = TextEditingController();
-  TextEditingController patahanController = TextEditingController();
-  TextEditingController seratController = TextEditingController();
-  TextEditingController buluController = TextEditingController();
+  TextEditingController mangkokAController = TextEditingController(text: "0");
+  TextEditingController mangkokBController = TextEditingController(text: "0");
+  TextEditingController mangkokCController = TextEditingController(text: "0");
+  TextEditingController kipasAController = TextEditingController(text: "0");
+  TextEditingController kipasBController = TextEditingController(text: "0");
+  TextEditingController kipasCController = TextEditingController(text: "0");
+  TextEditingController segitigaAController = TextEditingController(text: "0");
+  TextEditingController segitigaBController = TextEditingController(text: "0");
+  TextEditingController kakiController = TextEditingController(text: "0");
+  TextEditingController patahanController = TextEditingController(text: "0");
+  TextEditingController seratController = TextEditingController(text: "0");
+  TextEditingController buluController = TextEditingController(text: "0");
 
   final _formKey = GlobalKey<FormState>();
 
@@ -56,7 +56,7 @@ class _TambahBatchState extends State<TambahBatch> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(height: 5),
-            
+
                 Text(
                   "Tanggal Beli",
                   style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
@@ -79,8 +79,9 @@ class _TambahBatchState extends State<TambahBatch> {
                     ).then((pickedDate) {
                       if (pickedDate != null) {
                         setState(() {
-                          tanggalBeliController.text =
-                              dateToDetailDate(pickedDate);
+                          tanggalBeliController.text = dateToDetailDate(
+                            pickedDate,
+                          );
                         });
                       }
                     });
@@ -93,7 +94,7 @@ class _TambahBatchState extends State<TambahBatch> {
                   },
                 ),
                 SizedBox(height: 10),
-            
+
                 Text(
                   "Supplier",
                   style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
@@ -113,7 +114,7 @@ class _TambahBatchState extends State<TambahBatch> {
                   },
                 ),
                 SizedBox(height: 10),
-            
+
                 Text(
                   "Nama Barang",
                   style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
@@ -156,12 +157,13 @@ class _TambahBatchState extends State<TambahBatch> {
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Nama barang harus dipilih';
-                      };
-                    }
+                      }
+                      ;
+                    },
                   ),
                 ),
                 SizedBox(height: 10),
-            
+
                 Text(
                   "Berat (kg)",
                   style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
@@ -185,7 +187,7 @@ class _TambahBatchState extends State<TambahBatch> {
                   },
                 ),
                 SizedBox(height: 10),
-            
+
                 Text(
                   "Harga (Rp)",
                   style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
@@ -209,7 +211,7 @@ class _TambahBatchState extends State<TambahBatch> {
                   },
                 ),
                 SizedBox(height: 10),
-            
+
                 Text(
                   "Kadar Air (%)",
                   style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
@@ -233,13 +235,13 @@ class _TambahBatchState extends State<TambahBatch> {
                   },
                 ),
                 SizedBox(height: 10),
-            
+
                 Text(
                   "Komposisi",
                   style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 5),
-            
+
                 if (selectedNamaBarang != null) ...[
                   if (selectedNamaBarang == 'Mangkok') ...[
                     Container(
@@ -266,10 +268,13 @@ class _TambahBatchState extends State<TambahBatch> {
                                     decoration: InputDecoration(
                                       hintText: 'Masukkan berat (kg)',
                                       border: OutlineInputBorder(),
-                                      contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 5,
+                                      ),
                                     ),
                                     keyboardType: TextInputType.number,
-                                    validator:(value) {
+                                    validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return 'Berat A harus diisi';
                                       }
@@ -293,7 +298,10 @@ class _TambahBatchState extends State<TambahBatch> {
                                     decoration: InputDecoration(
                                       hintText: 'Masukkan berat (kg)',
                                       border: OutlineInputBorder(),
-                                      contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 5,
+                                      ),
                                     ),
                                     keyboardType: TextInputType.number,
                                     validator: (value) {
@@ -320,7 +328,10 @@ class _TambahBatchState extends State<TambahBatch> {
                                     decoration: InputDecoration(
                                       hintText: 'Masukkan berat (kg)',
                                       border: OutlineInputBorder(),
-                                      contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 5,
+                                      ),
                                     ),
                                     keyboardType: TextInputType.number,
                                     validator: (value) {
@@ -367,7 +378,10 @@ class _TambahBatchState extends State<TambahBatch> {
                                     decoration: InputDecoration(
                                       hintText: 'Masukkan berat (kg)',
                                       border: OutlineInputBorder(),
-                                      contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 5,
+                                      ),
                                     ),
                                     keyboardType: TextInputType.number,
                                     validator: (value) {
@@ -394,7 +408,10 @@ class _TambahBatchState extends State<TambahBatch> {
                                     decoration: InputDecoration(
                                       hintText: 'Masukkan berat (kg)',
                                       border: OutlineInputBorder(),
-                                      contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 5,
+                                      ),
                                     ),
                                     keyboardType: TextInputType.number,
                                     validator: (value) {
@@ -421,7 +438,10 @@ class _TambahBatchState extends State<TambahBatch> {
                                     decoration: InputDecoration(
                                       hintText: 'Masukkan berat (kg)',
                                       border: OutlineInputBorder(),
-                                      contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 5,
+                                      ),
                                     ),
                                     keyboardType: TextInputType.number,
                                     validator: (value) {
@@ -468,7 +488,10 @@ class _TambahBatchState extends State<TambahBatch> {
                                     decoration: InputDecoration(
                                       hintText: 'Masukkan berat (kg)',
                                       border: OutlineInputBorder(),
-                                      contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 5,
+                                      ),
                                     ),
                                     keyboardType: TextInputType.number,
                                     validator: (value) {
@@ -495,7 +518,10 @@ class _TambahBatchState extends State<TambahBatch> {
                                     decoration: InputDecoration(
                                       hintText: 'Masukkan berat (kg)',
                                       border: OutlineInputBorder(),
-                                      contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 5,
+                                      ),
                                     ),
                                     keyboardType: TextInputType.number,
                                     validator: (value) {
@@ -536,7 +562,10 @@ class _TambahBatchState extends State<TambahBatch> {
                                 decoration: InputDecoration(
                                   hintText: 'Masukkan berat (kg)',
                                   border: OutlineInputBorder(),
-                                  contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 5,
+                                  ),
                                 ),
                                 keyboardType: TextInputType.number,
                                 validator: (value) {
@@ -565,30 +594,35 @@ class _TambahBatchState extends State<TambahBatch> {
                       ),
                       child: Padding(
                         padding: const EdgeInsets.all(10.0),
-                        child: Row(children: [
-                          Text("Patahan: "),
-                          SizedBox(width: 5),
-                          Expanded(
-                            child: TextFormField(
-                              controller: patahanController,
-                              decoration: InputDecoration(
-                                hintText: 'Masukkan berat (kg)',
-                                border: OutlineInputBorder(),
-                                contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        child: Row(
+                          children: [
+                            Text("Patahan: "),
+                            SizedBox(width: 5),
+                            Expanded(
+                              child: TextFormField(
+                                controller: patahanController,
+                                decoration: InputDecoration(
+                                  hintText: 'Masukkan berat (kg)',
+                                  border: OutlineInputBorder(),
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 5,
+                                  ),
+                                ),
+                                keyboardType: TextInputType.number,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Berat harus diisi';
+                                  }
+                                  if (double.tryParse(value) == null) {
+                                    return 'Berat harus berupa angka';
+                                  }
+                                  return null;
+                                },
                               ),
-                              keyboardType: TextInputType.number,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Berat harus diisi';
-                                }
-                                if (double.tryParse(value) == null) {
-                                  return 'Berat harus berupa angka';
-                                }
-                                return null;
-                              },
                             ),
-                          ),
-                          ]),
+                          ],
+                        ),
                       ),
                     ),
                     SizedBox(height: 5),
@@ -612,7 +646,10 @@ class _TambahBatchState extends State<TambahBatch> {
                                 decoration: InputDecoration(
                                   hintText: 'Masukkan berat (kg)',
                                   border: OutlineInputBorder(),
-                                  contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 5,
+                                  ),
                                 ),
                                 keyboardType: TextInputType.number,
                                 validator: (value) {
@@ -651,7 +688,10 @@ class _TambahBatchState extends State<TambahBatch> {
                                 decoration: InputDecoration(
                                   hintText: 'Masukkan berat (kg)',
                                   border: OutlineInputBorder(),
-                                  contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 5,
+                                  ),
                                 ),
                                 keyboardType: TextInputType.number,
                                 validator: (value) {
@@ -673,21 +713,112 @@ class _TambahBatchState extends State<TambahBatch> {
                   ],
                   SizedBox(height: 20),
                 ],
+
                 Center(
                   child: ElevatedButton(
-                    onPressed: () {
-                      
+                    onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        addBatch(tanggalBeliController.text, selectedNamaBarang!);
+                        // Siapkan details sesuai barang yang dipilih
+                        List<Map<String, dynamic>> details = [];
                         if (selectedNamaBarang == 'Mangkok') {
-                          // addBatchDetails(batchId, 'A', int.parse(mangkokAController.text));
-                          // addBatchDetails(batchId, 'B', int.parse(mangkokBController.text))
+                          details = [
+                            {
+                              'komposisi': 'A',
+                              'berat': int.parse(mangkokAController.text),
+                            },
+                            {
+                              'komposisi': 'B',
+                              'berat': int.parse(mangkokBController.text),
+                            },
+                            {
+                              'komposisi': 'C',
+                              'berat': int.parse(mangkokCController.text),
+                            },
+                          ];
+                        } else if (selectedNamaBarang == 'Kipas') {
+                          details = [
+                            {
+                              'komposisi': 'A',
+                              'berat': int.parse(kipasAController.text),
+                            },
+                            {
+                              'komposisi': 'B',
+                              'berat': int.parse(kipasBController.text),
+                            },
+                            {
+                              'komposisi': 'C',
+                              'berat': int.parse(kipasCController.text),
+                            },
+                          ];
+                        } else if (selectedNamaBarang == 'Segitiga') {
+                          details = [
+                            {
+                              'komposisi': 'A',
+                              'berat': int.parse(segitigaAController.text),
+                            },
+                            {
+                              'komposisi': 'B',
+                              'berat': int.parse(segitigaBController.text),
+                            },
+                          ];
+                        } else if (selectedNamaBarang == 'Kaki') {
+                          details = [
+                            {
+                              'komposisi': 'Kaki',
+                              'berat': int.parse(kakiController.text),
+                            },
+                          ];
+                        } else if (selectedNamaBarang == 'Patahan') {
+                          details = [
+                            {
+                              'komposisi': 'Patahan',
+                              'berat': int.parse(patahanController.text),
+                            },
+                          ];
+                        } else if (selectedNamaBarang == 'Serat') {
+                          details = [
+                            {
+                              'komposisi': 'Serat',
+                              'berat': int.parse(seratController.text),
+                            },
+                          ];
+                        } else if (selectedNamaBarang == 'Bulu') {
+                          details = [
+                            {
+                              'komposisi': 'Bulu',
+                              'berat': int.parse(buluController.text),
+                            },
+                          ];
                         }
-                        Navigator.pop(context);
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Mohon isi semua field dengan benar')),
+
+                        final batchId = await addBatchWithDetails(
+                          batchName: selectedNamaBarang!,
+                          date: detailDateToStringDate(
+                            tanggalBeliController.text,
+                          ),
+                          details: details,
                         );
+
+                        if (!context.mounted) return;
+
+                        if (batchId != null) {
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Batch berhasil ditambahkan!'),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Gagal menambahkan batch, coba lagi',
+                              ),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
                       }
                     },
                     child: Text('Simpan'),

@@ -6,20 +6,17 @@ String dateToDetailDate(DateTime date) {
   return "${namaHari(date.weekday % 7)}, ${date.day.toString().padLeft(2, '0')} ${namaBulan(date.month)} ${date.year.toString().padLeft(4, '0')}";
 }
 
-// String detailDateToStringDate(String detailDate) {
-//   List<String> parts = detailDate.split(', ');
-//   String dayName = parts[0];
-//   String datePart = parts[1];
+String detailDateToStringDate(String detailDate) {
+  List<String> parts = detailDate.split(', ');
+  String datePart = parts[1];
   
-//   List<String> dateParts = datePart.split(' ');
-//   String day = dateParts[0];
-//   String monthName = dateParts[1];
-//   String year = dateParts[2];
-  
-//   int monthIndex = namaBulan()
-  
-//   return "$year-${monthIndex.toString().padLeft(2, '0')}-${day.padLeft(2, '0')}";
-// }
+  List<String> dateParts = datePart.split(' ');
+  String day = dateParts[0];
+  String monthName = dateParts[1];
+  String year = dateParts[2];
+
+  return "$year-${monthIndex(monthName).toString().padLeft(2, '0')}-${day.padLeft(2, '0')}";
+}
 
 String namaHari(int index) {
   switch (index) {
@@ -69,5 +66,35 @@ String namaBulan(int index) {
       return "Desember";
   }
   return "";
+}
+
+int monthIndex(String monthName) {
+  switch (monthName) {
+    case "Januari":
+      return 1;
+    case "Februari":
+      return 2;
+    case "Maret":
+      return 3;
+    case "April":
+      return 4;
+    case "Mei":
+      return 5;
+    case "Juni":
+      return 6;
+    case "Juli":
+      return 7;
+    case "Agustus":
+      return 8;
+    case "September":
+      return 9;
+    case "Oktober":
+      return 10;
+    case "November":
+      return 11;
+    case "Desember":
+      return 12;
+  }
+  return 0;
 }
 

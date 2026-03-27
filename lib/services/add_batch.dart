@@ -1,34 +1,57 @@
 import 'package:flutter_application_1/services/check_batch.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-Future<void> addBatch(String batchName, String date) async {
-  String batchId = "${date}_$batchName";
-  final data = await checkBatch(batchId);
-  if (data.isNotEmpty) {
-    batchId = "${date}_${batchName}_${(data.length + 1).toString().padLeft(2, '0')}";
-  } else {
-    batchId = "${date}_${batchName}_01";
-  }
+Future<String?> addBatchWithDetails({
+  required String batchName,
+  required String date,
+  required List<Map<String, dynamic>> details,
+}) async {
+  String batchId = '';
+  
+  try {
+    // Generate batch ID (sama seperti sebelumnya)
+    final data = await checkBatch("${date}_$batchName");
+    if (data.isNotEmpty) {
+      batchId = "${date}_${batchName}_${(data.length + 1).toString().padLeft(2, '0')}";
+    } else {
+      batchId = "${date}_${batchName}_01";
+    }
 
-  final response = await Supabase.instance.client
-      .from('batches')
-      .insert({'id': batchId,'name': batchName, 'date': date});
+    // Insert batch dulu
+    await Supabase.instance.client.from('batches').insert({
+      'id': batchId,
+      'name': batchName,
+      'date': date,
+    });
 
-  if (response.error != null) {
-    print('Error adding batch: ${response.error!.message}');
-  } else {
-    print('Batch added successfully!');
-  }
-}
+    // Insert semua details, kalau salah satu gagal langsung throw
+    for (final detail in details) {
+      await Supabase.instance.client.from('batches_details').insert({
+        'id': '${batchId}_${detail['komposisi']}',
+        'batch_id': batchId,
+        'komposisi': detail['komposisi'],
+        'berat': detail['berat'],
+      });
+    }
 
-Future<void> addBatchDetails(String batchId, String komposisi, int berat) async {
-  final response = await Supabase.instance.client
-      .from('batch_details')
-      .insert({'batch_id': batchId, 'komposisi': komposisi, 'berat': berat});
+    return batchId; // sukses semua
 
-  if (response.error != null) {
-    print('Error adding batch details: ${response.error!.message}');
-  } else {
-    print('Batch details added successfully!');
+  } catch (error) {
+    print('Error: $error');
+
+    // Kalau batchId sudah terbuat, hapus batchnya (rollback manual)
+    if (batchId.isNotEmpty) {
+      try {
+        await Supabase.instance.client
+            .from('batches')
+            .delete()
+            .eq('id', batchId);
+        print('Batch $batchId berhasil dihapus karena error');
+      } catch (deleteError) {
+        print('Gagal hapus batch: $deleteError');
+      }
+    }
+
+    return null; // gagal
   }
 }
