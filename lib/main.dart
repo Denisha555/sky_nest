@@ -1,16 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/dashboard.dart';
 import 'package:flutter_application_1/login.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
-
-  await Supabase.initialize(
-    url: 'https://gcqrglzxeqgphjbuiiab.supabase.co',
-    anonKey: 'sb_publishable_2Jjodc6ghnHOaX3MMCwkWg_aXzX564H',
-  );
   runApp(const MainApp());
 }
 
@@ -21,6 +15,13 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.blue,
+          titleTextStyle: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+          iconTheme: IconThemeData(color: Colors.white),
+        ),
+      ),
       title: 'Sky Nest',
       home: SplashScreen(),
     );
@@ -50,14 +51,26 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     );
 
     _controller.forward();
+     _initApp(); 
 
-    Timer(Duration(seconds: 3), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => Login()),
-      );
-    });
   }
+
+Future<void> _initApp() async {
+    await Supabase.initialize(
+    url: 'https://gcqrglzxeqgphjbuiiab.supabase.co',
+    anonKey: 'sb_publishable_2Jjodc6ghnHOaX3MMCwkWg_aXzX564H',
+  );
+
+  // Tunggu minimal 3 detik biar splash keliatan
+  await Future.delayed(const Duration(seconds: 3));
+
+  if (!mounted) return;
+
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (context) => Login()),
+  );
+}
 
   @override
   void dispose() {
