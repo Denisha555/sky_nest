@@ -12,7 +12,6 @@ class TambahBatch extends StatefulWidget {
 class _TambahBatchState extends State<TambahBatch> {
   TextEditingController tanggalBeliController = TextEditingController();
   TextEditingController supplierController = TextEditingController();
-  TextEditingController beratController = TextEditingController();
   TextEditingController hargaController = TextEditingController();
   TextEditingController kadarAirController = TextEditingController();
 
@@ -164,29 +163,7 @@ class _TambahBatchState extends State<TambahBatch> {
                 ),
                 SizedBox(height: 10),
 
-                Text(
-                  "Berat (kg)",
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 5),
-                TextFormField(
-                  controller: beratController,
-                  decoration: InputDecoration(
-                    hintText: 'Masukkan berat dalam kg',
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.number,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Berat harus diisi';
-                    }
-                    if (double.tryParse(value) == null) {
-                      return 'Berat harus berupa angka';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 10),
+                
 
                 Text(
                   "Harga (Rp)",
@@ -724,69 +701,69 @@ class _TambahBatchState extends State<TambahBatch> {
                           details = [
                             {
                               'komposisi': 'A',
-                              'berat': int.parse(mangkokAController.text),
+                              'berat': double.parse(mangkokAController.text),
                             },
                             {
                               'komposisi': 'B',
-                              'berat': int.parse(mangkokBController.text),
+                              'berat': double.parse(mangkokBController.text),
                             },
                             {
                               'komposisi': 'C',
-                              'berat': int.parse(mangkokCController.text),
+                              'berat': double.parse(mangkokCController.text),
                             },
                           ];
                         } else if (selectedNamaBarang == 'Kipas') {
                           details = [
                             {
                               'komposisi': 'A',
-                              'berat': int.parse(kipasAController.text),
+                              'berat': double.parse(kipasAController.text),
                             },
                             {
                               'komposisi': 'B',
-                              'berat': int.parse(kipasBController.text),
+                              'berat': double.parse(kipasBController.text),
                             },
                             {
                               'komposisi': 'C',
-                              'berat': int.parse(kipasCController.text),
+                              'berat': double.parse(kipasCController.text),
                             },
                           ];
                         } else if (selectedNamaBarang == 'Segitiga') {
                           details = [
                             {
                               'komposisi': 'A',
-                              'berat': int.parse(segitigaAController.text),
+                              'berat': double.parse(segitigaAController.text),
                             },
                             {
                               'komposisi': 'B',
-                              'berat': int.parse(segitigaBController.text),
+                              'berat': double.parse(segitigaBController.text),
                             },
                           ];
                         } else if (selectedNamaBarang == 'Kaki') {
                           details = [
                             {
                               'komposisi': 'Kaki',
-                              'berat': int.parse(kakiController.text),
+                              'berat': double.parse(kakiController.text),
                             },
                           ];
                         } else if (selectedNamaBarang == 'Patahan') {
                           details = [
                             {
                               'komposisi': 'Patahan',
-                              'berat': int.parse(patahanController.text),
+                              'berat': double.parse(patahanController.text),
                             },
                           ];
                         } else if (selectedNamaBarang == 'Serat') {
                           details = [
                             {
                               'komposisi': 'Serat',
-                              'berat': int.parse(seratController.text),
+                              'berat': double.parse(seratController.text),
                             },
                           ];
                         } else if (selectedNamaBarang == 'Bulu') {
                           details = [
                             {
                               'komposisi': 'Bulu',
-                              'berat': int.parse(buluController.text),
+                              'berat': double.parse(buluController.text),
                             },
                           ];
                         }
@@ -796,6 +773,7 @@ class _TambahBatchState extends State<TambahBatch> {
                           date: detailDateToStringDate(
                             tanggalBeliController.text,
                           ),
+                          supplier: supplierController.text,
                           details: details,
                         );
 

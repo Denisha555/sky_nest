@@ -2,7 +2,7 @@ import "package:supabase_flutter/supabase_flutter.dart";
 
 Future<List<Map<String, dynamic>>> getAllBatch() async {
   final response = await Supabase.instance.client
-      .from('batch')
+      .from('batches')
       .select();
 
   if (response.isEmpty) {

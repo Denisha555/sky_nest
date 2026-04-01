@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 Future<String?> addBatchWithDetails({
   required String batchName,
   required String date,
+  required String supplier,
   required List<Map<String, dynamic>> details,
 }) async {
   String batchId = '';
@@ -22,6 +23,7 @@ Future<String?> addBatchWithDetails({
       'id': batchId,
       'name': batchName,
       'date': date,
+      'supplier': supplier,
     });
 
     // Insert semua details, kalau salah satu gagal langsung throw

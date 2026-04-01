@@ -61,7 +61,6 @@ Future<void> _initApp() async {
     anonKey: 'sb_publishable_2Jjodc6ghnHOaX3MMCwkWg_aXzX564H',
   );
 
-  // Tunggu minimal 3 detik biar splash keliatan
   await Future.delayed(const Duration(seconds: 3));
 
   if (!mounted) return;
