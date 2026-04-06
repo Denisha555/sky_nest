@@ -28,11 +28,11 @@ class _DataBatchState extends State<DataBatch> {
       batchDetails.addAll(await getBatchDetails(batch['id']));
     }
 
-    if (!mounted) return; // ← Tambah ini
+    if (!mounted) return; 
     setState(() {
       _batches = batches;
       _batchDetails = batchDetails;
-      _isLoading = false; // ← Tambah ini
+      _isLoading = false; 
     });
   }
 

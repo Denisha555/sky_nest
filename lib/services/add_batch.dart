@@ -33,6 +33,7 @@ Future<String?> addBatchWithDetails({
         'batch_id': batchId,
         'komposisi': detail['komposisi'],
         'berat': detail['berat'],
+        'harga': detail['harga'],
       });
     }
 

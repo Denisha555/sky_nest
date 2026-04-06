@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/dashboard.dart';
 import 'package:flutter_application_1/login.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -64,11 +66,20 @@ Future<void> _initApp() async {
   await Future.delayed(const Duration(seconds: 3));
 
   if (!mounted) return;
-
-  Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(builder: (context) => Login()),
-  );
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? savedUsername = prefs.getString('username');
+  
+  if (savedUsername != null) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => Dashboard()),
+    );
+  } else {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => Login()),
+    );
+  }
 }
 
   @override

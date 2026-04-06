@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/dashboard.dart';
 import 'package:flutter_application_1/services/check_user.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -15,6 +16,8 @@ class _LoginState extends State<Login> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
+   @override
+
   @override
   void dispose() {
     usernameController.dispose();
@@ -23,7 +26,6 @@ class _LoginState extends State<Login> {
   }
 
   Future<void> _handleLogin() async {
-    // Cek formKey benar tanpa force unwrap
     print('Login button pressed');
     if (_formKey.currentState == null) {
       print('Form state is null');
@@ -48,7 +50,7 @@ class _LoginState extends State<Login> {
       print('Login attempt completed');
 
       if (!mounted) return;
-      
+
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -60,6 +62,8 @@ class _LoginState extends State<Login> {
           context,
           MaterialPageRoute(builder: (context) => Dashboard()),
         );
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('username', usernameController.text);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -88,64 +92,65 @@ class _LoginState extends State<Login> {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false, 
       body: Stack(
         children: [
           // Konten utama
-          Center(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(height: screenHeight * 0.1),
-                Image(
-                  image: const AssetImage('assets/image/logo.png'),
-                  width: screenWidth * 0.5,
-                  height: screenHeight * 0.2,
-                ),
-                const SizedBox(height: 5),
-                const Text(
-                  "Login",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 15),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(height: screenHeight * 0.1),
+              Image(
+                image: const AssetImage('assets/image/logo.png'),
+                width: screenWidth * 0.5,
+                height: screenHeight * 0.2,
+              ),
+              const SizedBox(height: 5),
+              const Text(
+                "Login",
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 15),
 
-                Expanded(
-                  child: Stack(
-                    children: [
-                      // Background biru
-                      Container(
-                        width: double.infinity,
-                        height: double.infinity,
-                        decoration: const BoxDecoration(
-                          color: Colors.blue,
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(30),
-                            topRight: Radius.circular(30),
-                          ),
+              Expanded(
+                child: Stack(
+                  children: [
+                    // Background biru
+                    Container(
+                      width: double.infinity,
+                      height: double.infinity,
+                      decoration: const BoxDecoration(
+                        color: Colors.blue,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(30),
+                          topRight: Radius.circular(30),
                         ),
                       ),
+                    ),
 
-                      // Card form
-                      Padding(
-                        padding: const EdgeInsets.only(
-                          top: 30.0,
-                          left: 20.0,
-                          right: 20.0,
-                          bottom: 30.0,
-                        ),
+                    // Card form dengan SingleChildScrollView
+                    Padding(
+                      padding: EdgeInsets.only(
+                        top: 30.0,
+                        left: 20.0,
+                        right: 20.0,
+                        // padding bawah menyesuaikan tinggi keyboard
+                        bottom: MediaQuery.of(context).viewInsets.bottom ,
+                      ),
+                      child: SingleChildScrollView( // ← bisa scroll saat keyboard muncul
                         child: Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
                             color: Colors.white,
                           ),
                           width: double.infinity,
-                          height: double.infinity,
                           child: Padding(
                             padding: const EdgeInsets.all(15.0),
                             child: Form(
                               key: _formKey,
                               child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min, // ← wrap konten, tidak full height
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   // Username
@@ -215,11 +220,11 @@ class _LoginState extends State<Login> {
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
 
           // Loading overlay
