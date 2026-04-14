@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/const_file.dart';
 import 'package:flutter_application_1/services/add_batch.dart';
 import 'package:flutter_application_1/constant_file.dart';
 
@@ -223,16 +224,6 @@ String _formatRupiah(double value) {
   return result.toString();
 }
 
-Map<String, List<String>> _komposisiConfig = {
-  'Mangkok': ['Mangkok A', 'Mangkok B', 'Mangkok C'],
-  'Kipas': ['Kipas A', 'Kipas B', 'Kipas C'],
-  'Segitiga': ['Segitiga A', 'Segitiga B'],
-  'Kaki': ['Kaki'],
-  'Patahan': ['Patahan'],
-  'Serat': ['Serat'],
-  'Bulu': ['Bulu'],
-};
-
 class TambahBatch extends StatefulWidget {
   const TambahBatch({super.key});
 
@@ -255,7 +246,7 @@ class _TambahBatchState extends State<TambahBatch> {
     for (final item in _komposisiItems) {
       item.dispose();
     }
-    final labels = _komposisiConfig[value] ?? [];
+    final labels = komposisiConfig[value] ?? [];
     setState(() {
       selectedNamaBarang = value;
       _komposisiItems =
@@ -403,7 +394,7 @@ class _TambahBatchState extends State<TambahBatch> {
                   contentPadding:
                       EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                 ),
-                items: _komposisiConfig.keys
+                items: komposisiConfig.keys
                     .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                     .toList(),
                 onChanged: _onBarangChanged,

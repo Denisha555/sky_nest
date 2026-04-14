@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/data_batch.dart';
+import 'package:flutter_application_1/data_process.dart';
 import 'package:flutter_application_1/tambah_batch.dart';
 
 class Dashboard extends StatefulWidget {
@@ -15,7 +16,7 @@ class _DashboardState extends State<Dashboard> {
     return Scaffold(
       appBar: AppBar(title: Text('Dashboard'), backgroundColor: Colors.blue, centerTitle: true, titleTextStyle: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),),
       body: Padding(
-        padding: const EdgeInsets.all(10.0),
+        padding: const EdgeInsets.all(16.0),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -68,7 +69,14 @@ class _DashboardState extends State<Dashboard> {
                   context,
                   MaterialPageRoute(builder: (context) => DataBatch()),
                 );
-              }, child: const Text('Data Batch'))
+              }, child: const Text('Data Batch')),
+              SizedBox(height: 10),
+              ElevatedButton(onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => DataProcess()),
+                );
+              }, child: Text('Data Proses'))
             ],
           ),
         ),
