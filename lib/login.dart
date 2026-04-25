@@ -11,6 +11,7 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
+  bool isPasswordHidden = true;
   bool isLoading = false;
   final _formKey = GlobalKey<FormState>();
   final TextEditingController usernameController = TextEditingController();
@@ -105,16 +106,19 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
 
     return Scaffold(
       body: SafeArea(
-        child: Stack( // ✅ Stack di level atas agar overlay bisa full-screen
+        child: Stack(
+          // ✅ Stack di level atas agar overlay bisa full-screen
           children: [
             FadeTransition(
               opacity: _fadeAnimation,
               child: SlideTransition(
                 position: _slideAnimation,
                 child: SingleChildScrollView(
-                  child: ConstrainedBox( // ✅ pastikan minimum setinggi layar
+                  child: ConstrainedBox(
+                    // ✅ pastikan minimum setinggi layar
                     constraints: BoxConstraints(
-                      minHeight: screenHeight - MediaQuery.of(context).padding.top,
+                      minHeight:
+                          screenHeight - MediaQuery.of(context).padding.top,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -167,7 +171,9 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                                 children: [
                                   const Text(
                                     "Username",
-                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                   const SizedBox(height: 5),
                                   TextFormField(
@@ -186,15 +192,30 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                                   const SizedBox(height: 10),
                                   const Text(
                                     "Password",
-                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                   const SizedBox(height: 5),
                                   TextFormField(
                                     controller: passwordController,
-                                    obscureText: true,
-                                    decoration: const InputDecoration(
-                                      border: OutlineInputBorder(),
+                                    obscureText: isPasswordHidden,
+                                    decoration: InputDecoration(
+                                      border: const OutlineInputBorder(),
                                       hintText: "Masukkan Password",
+                                      suffixIcon: IconButton(
+                                        icon: Icon(
+                                          isPasswordHidden
+                                              ? Icons.visibility_off
+                                              : Icons.visibility,
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            isPasswordHidden =
+                                                !isPasswordHidden;
+                                          });
+                                        },
+                                      ),
                                     ),
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
@@ -208,11 +229,14 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                                     width: double.infinity,
                                     height: 40,
                                     child: ElevatedButton(
-                                      onPressed: isLoading ? null : _handleLogin,
+                                      onPressed:
+                                          isLoading ? null : _handleLogin,
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.blue,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
                                         ),
                                       ),
                                       child: const Text(
