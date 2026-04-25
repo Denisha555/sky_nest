@@ -10,48 +10,63 @@ class Login extends StatefulWidget {
   State<Login> createState() => _LoginState();
 }
 
-class _LoginState extends State<Login> {
+class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
   bool isLoading = false;
   final _formKey = GlobalKey<FormState>();
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-   @override
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 1000),
+      vsync: this,
+    );
+    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 1),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+    _animationController.forward();
+  }
 
   @override
   void dispose() {
+    _animationController.dispose(); // ✅ tambahan
     usernameController.dispose();
     passwordController.dispose();
     super.dispose();
   }
 
   Future<void> _handleLogin() async {
-    print('Login button pressed');
-    if (_formKey.currentState == null) {
-      print('Form state is null');
-      return;
-    }
-
-    if (!_formKey.currentState!.validate()) {
-      print('Form is not valid');
-      return;
-    }
-
+    if (_formKey.currentState == null) return;
+    if (!_formKey.currentState!.validate()) return;
     if (!mounted) return;
-    print('Form is valid, proceeding with login');
+
     setState(() => isLoading = true);
 
     try {
-      print('Attempting login with username: ${usernameController.text}');
       final success = await checkUser(
         usernameController.text,
         passwordController.text,
       );
-      print('Login attempt completed');
 
       if (!mounted) return;
 
       if (success) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('username', usernameController.text);
+
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Login Berhasil!'),
@@ -62,8 +77,6 @@ class _LoginState extends State<Login> {
           context,
           MaterialPageRoute(builder: (context) => Dashboard()),
         );
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setString('username', usernameController.text);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -73,7 +86,6 @@ class _LoginState extends State<Login> {
         );
       }
     } catch (e) {
-      print('Error login: $e');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -92,68 +104,67 @@ class _LoginState extends State<Login> {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      resizeToAvoidBottomInset: false, 
-      body: Stack(
-        children: [
-          // Konten utama
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(height: screenHeight * 0.1),
-              Image(
-                image: const AssetImage('assets/image/logo.png'),
-                width: screenWidth * 0.5,
-                height: screenHeight * 0.2,
-              ),
-              const SizedBox(height: 5),
-              const Text(
-                "Login",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 15),
-
-              Expanded(
-                child: Stack(
-                  children: [
-                    // Background biru
-                    Container(
-                      width: double.infinity,
-                      height: double.infinity,
-                      decoration: const BoxDecoration(
-                        color: Colors.blue,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(30),
-                          topRight: Radius.circular(30),
-                        ),
-                      ),
+      body: SafeArea(
+        child: Stack( // ✅ Stack di level atas agar overlay bisa full-screen
+          children: [
+            FadeTransition(
+              opacity: _fadeAnimation,
+              child: SlideTransition(
+                position: _slideAnimation,
+                child: SingleChildScrollView(
+                  child: ConstrainedBox( // ✅ pastikan minimum setinggi layar
+                    constraints: BoxConstraints(
+                      minHeight: screenHeight - MediaQuery.of(context).padding.top,
                     ),
-
-                    // Card form dengan SingleChildScrollView
-                    Padding(
-                      padding: EdgeInsets.only(
-                        top: 30.0,
-                        left: 20.0,
-                        right: 20.0,
-                        // padding bawah menyesuaikan tinggi keyboard
-                        bottom: MediaQuery.of(context).viewInsets.bottom ,
-                      ),
-                      child: SingleChildScrollView( // ← bisa scroll saat keyboard muncul
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color: Colors.white,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        SizedBox(height: screenHeight * 0.1),
+                        Image(
+                          image: const AssetImage('assets/image/logo.png'),
+                          width: screenWidth * 0.5,
+                          height: screenHeight * 0.2,
+                        ),
+                        const SizedBox(height: 5),
+                        const Text(
+                          "Login",
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
                           ),
+                        ),
+                        const SizedBox(height: 15),
+
+                        // ✅ Ganti Expanded dengan Container biasa
+                        Container(
                           width: double.infinity,
-                          child: Padding(
+                          decoration: const BoxDecoration(
+                            color: Colors.blue,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(30),
+                              topRight: Radius.circular(30),
+                            ),
+                          ),
+                          padding: const EdgeInsets.only(
+                            top: 30.0,
+                            left: 20.0,
+                            right: 20.0,
+                            bottom: 40.0,
+                          ),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Colors.white,
+                            ),
+                            width: double.infinity,
                             padding: const EdgeInsets.all(15.0),
                             child: Form(
                               key: _formKey,
                               child: Column(
-                                mainAxisSize: MainAxisSize.min, // ← wrap konten, tidak full height
+                                mainAxisSize: MainAxisSize.min,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  // Username
                                   const Text(
                                     "Username",
                                     style: TextStyle(fontWeight: FontWeight.bold),
@@ -173,8 +184,6 @@ class _LoginState extends State<Login> {
                                     },
                                   ),
                                   const SizedBox(height: 10),
-
-                                  // Password
                                   const Text(
                                     "Password",
                                     style: TextStyle(fontWeight: FontWeight.bold),
@@ -182,11 +191,11 @@ class _LoginState extends State<Login> {
                                   const SizedBox(height: 5),
                                   TextFormField(
                                     controller: passwordController,
+                                    obscureText: true,
                                     decoration: const InputDecoration(
                                       border: OutlineInputBorder(),
                                       hintText: "Masukkan Password",
                                     ),
-                                    obscureText: true,
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return 'Password tidak boleh kosong';
@@ -195,8 +204,6 @@ class _LoginState extends State<Login> {
                                     },
                                   ),
                                   const SizedBox(height: 20),
-
-                                  // Tombol Login
                                   SizedBox(
                                     width: double.infinity,
                                     height: 40,
@@ -219,33 +226,33 @@ class _LoginState extends State<Login> {
                             ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
-            ],
-          ),
-
-          // Loading overlay
-          if (isLoading)
-            Container(
-              width: double.infinity,
-              height: double.infinity,
-              color: Colors.black.withOpacity(0.3),
-              child: const Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(color: Colors.white),
-                  SizedBox(height: 10),
-                  Text(
-                    "Loading...",
-                    style: TextStyle(color: Colors.white, fontSize: 16),
-                  ),
-                ],
-              ),
             ),
-        ],
+
+            // ✅ Loading overlay sekarang benar-benar full-screen
+            if (isLoading)
+              Container(
+                color: Colors.black.withOpacity(0.3),
+                child: const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(color: Colors.white),
+                      SizedBox(height: 10),
+                      Text(
+                        "Loading...",
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

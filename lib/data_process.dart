@@ -320,6 +320,7 @@ class _DataProcessState extends State<DataProcess>
                           ),
                         );
                       }),
+
                     ],
                   ),
                 ),
@@ -353,7 +354,7 @@ class _DataProcessState extends State<DataProcess>
                           ? null
                           : () {
                             if (_formKey.currentState!.validate()) {
-                              // TODO: logika simpan data
+                              
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text('Data berhasil disimpan'),

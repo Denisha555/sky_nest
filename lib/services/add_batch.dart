@@ -5,6 +5,7 @@ Future<String?> addBatchWithDetails({
   required String batchName,
   required String date,
   required String supplier,
+  required String kadarAir,
   required List<Map<String, dynamic>> details,
 }) async {
   String batchId = '';
@@ -24,6 +25,7 @@ Future<String?> addBatchWithDetails({
       'name': batchName,
       'date': date,
       'supplier': supplier,
+      'kadar_air': kadarAir,
     });
 
     // Insert semua details, kalau salah satu gagal langsung throw

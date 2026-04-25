@@ -287,6 +287,7 @@ class _TambahBatchState extends State<TambahBatch> {
       batchName: selectedNamaBarang!,
       date: detailDateToStringDate(tanggalBeliController.text),
       supplier: supplierController.text,
+      kadarAir: kadarAirController.text,
       details: details,
     );
 
