@@ -56,6 +56,7 @@ class _DashboardState extends State<Dashboard> {
                   trailing: Text('10%', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black)),
                 ),
               ),
+
               ElevatedButton(onPressed: () {
                 Navigator.push(
                   context,
@@ -63,6 +64,7 @@ class _DashboardState extends State<Dashboard> {
                 );
               }, 
               child: const Text('Tambah Batch')),
+              
               SizedBox(height: 10),
               ElevatedButton(onPressed: () {
                 Navigator.push(

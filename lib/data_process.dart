@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/const_file.dart';
 import 'package:flutter_application_1/services/get_batch.dart';
+import 'package:flutter_application_1/services/check_batch.dart';
+import 'package:flutter_application_1/services/edit_batch.dart';
 
 class _KomposisiItem {
   final String label;
@@ -34,10 +36,11 @@ class DataProcess extends StatefulWidget {
 
 class _DataProcessState extends State<DataProcess>
     with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
   final _formKey = GlobalKey<FormState>();
 
+  String? errorMessage;
   String? selectedBatch;
+  String? batchId;
   String? selectedMetodeCuci; // ← dipindah ke dalam class
 
   List<Map<String, dynamic>> dataBatch = [];
@@ -48,7 +51,6 @@ class _DataProcessState extends State<DataProcess>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this);
     getBatchData();
   }
 
@@ -73,6 +75,7 @@ class _DataProcessState extends State<DataProcess>
       (b) => b['id'].toString() == value,
       orElse: () => {},
     );
+    
 
     // Gunakan nama barang sebagai key komposisiConfig
     // Sesuaikan 'name' dengan key yang ada di dataBatch kamu
@@ -84,13 +87,16 @@ class _DataProcessState extends State<DataProcess>
 
     setState(() {
       selectedBatch = value;
+      batchId = selectedData['id']?.toString() ?? '';
       print('data batch detail:$dataBatchDetail');
       _komposisiItems =
           labels.map((l) {
             final dataList = dataBatchDetail.where(
-              (item) => item['komposisi'].toString().trim() == l.split(" ").last.toString().trim()
+              (item) =>
+                  item['komposisi'].toString().trim() ==
+                  l.split(" ").last.toString().trim(),
             );
-           
+
             print("Data untuk komposisi '$l': ${dataList.toList()}");
 
             final data = dataList.isNotEmpty ? dataList.first : null;
@@ -103,7 +109,7 @@ class _DataProcessState extends State<DataProcess>
     });
   }
 
-  Future <void> _fetchBatchDetail(String batchId) async {
+  Future<void> _fetchBatchDetail(String batchId) async {
     final data = await getBatchDetails(batchId);
     setState(() {
       dataBatchDetail = data;
@@ -112,7 +118,6 @@ class _DataProcessState extends State<DataProcess>
 
   @override
   void dispose() {
-    _controller.dispose();
     susutController.dispose();
     for (final item in _komposisiItems) {
       item.dispose();
@@ -197,6 +202,12 @@ class _DataProcessState extends State<DataProcess>
                     selectedMetodeCuci = value;
                   });
                 },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Metode cuci harus dipilih';
+                  }
+                  return null;
+                },
               ),
 
               const SizedBox(height: 10),
@@ -223,7 +234,7 @@ class _DataProcessState extends State<DataProcess>
                       Row(
                         children: const [
                           Expanded(
-                            flex: 2,
+                            flex: 3,
                             child: Text(
                               "Jenis",
                               style: TextStyle(fontWeight: FontWeight.bold),
@@ -247,7 +258,7 @@ class _DataProcessState extends State<DataProcess>
                           ),
                           SizedBox(width: 10),
                           Expanded(
-                            flex: 3,
+                            flex: 2,
                             child: Text(
                               "Susut",
                               style: TextStyle(fontWeight: FontWeight.bold),
@@ -262,7 +273,7 @@ class _DataProcessState extends State<DataProcess>
                           padding: const EdgeInsets.symmetric(vertical: 6.0),
                           child: Row(
                             children: [
-                              Expanded(flex: 2, child: Text(item.label)),
+                              Expanded(flex: 3, child: Text(item.label)),
                               const SizedBox(width: 10),
                               Expanded(
                                 flex: 3,
@@ -295,15 +306,34 @@ class _DataProcessState extends State<DataProcess>
                                       vertical: 8,
                                     ),
                                   ),
-                                  onChanged: (_) => setState(() {}),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      errorMessage =
+                                          'Berat akhir tidak boleh kosong';
+                                    } else if (double.tryParse(value) == null) {
+                                      errorMessage =
+                                          'Berat akhir harus berupa angka';
+                                    } else if (double.tryParse(value)! >
+                                        double.tryParse(item.beratAwal)!) {
+                                      errorMessage =
+                                          'Berat akhir tidak boleh lebih besar dari berat awal';
+                                    }
+                                  },
+                                  onChanged: (_) => setState(() {
+                                    final beratAkhir = item.beratAkhir;
+                                    final beratAwal = double.tryParse(item.beratAwal) ?? 0;
+                                    final susut = (beratAwal - beratAkhir) / beratAwal * 100;
+                                    item.susutCtrl.text = susut.toStringAsFixed(2);
+                                  }),
                                 ),
                               ),
                               const SizedBox(width: 10),
                               Expanded(
-                                flex: 3,
+                                flex: 2,
                                 child: TextFormField(
                                   controller: item.susutCtrl,
                                   keyboardType: TextInputType.number,
+                                  readOnly: true,
                                   decoration: const InputDecoration(
                                     border: OutlineInputBorder(),
                                     hintText: 'Susut',
@@ -313,14 +343,12 @@ class _DataProcessState extends State<DataProcess>
                                       vertical: 8,
                                     ),
                                   ),
-                                  onChanged: (_) => setState(() {}),
                                 ),
                               ),
                             ],
                           ),
                         );
                       }),
-
                     ],
                   ),
                 ),
@@ -351,13 +379,32 @@ class _DataProcessState extends State<DataProcess>
                 child: ElevatedButton(
                   onPressed:
                       _komposisiItems.isEmpty
-                          ? null
-                          : () {
-                            if (_formKey.currentState!.validate()) {
-                              
+                          ? () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'Harap isikan semua data dengan lengkap',
+                                ),
+                              ),
+                            );
+                          }
+                          : () async{
+                            if (errorMessage == null || errorMessage! == "") {
+                              await editBatchWithDetails(
+                                batchId: "${batchId}_${_komposisiItems[0].label.split(' ').last}",
+                                metodeCuci: selectedMetodeCuci ?? '',
+                                komposisi: _komposisiItems[0].label.split(" ").last, 
+                                beratAkhir: _komposisiItems[0].beratAkhir.toString(),
+                              );
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text('Data berhasil disimpan'),
+                                ),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(errorMessage!),
                                 ),
                               );
                             }

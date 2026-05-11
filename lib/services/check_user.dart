@@ -2,8 +2,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:crypto/crypto.dart';
 import 'dart:async';
 import 'dart:convert';
-import 'package:http/http.dart' as http;
-
 
 Future<bool> checkUser(String username, String password) async {
   try {
