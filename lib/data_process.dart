@@ -75,7 +75,6 @@ class _DataProcessState extends State<DataProcess>
       (b) => b['id'].toString() == value,
       orElse: () => {},
     );
-    
 
     // Gunakan nama barang sebagai key komposisiConfig
     // Sesuaikan 'name' dengan key yang ada di dataBatch kamu
@@ -319,12 +318,19 @@ class _DataProcessState extends State<DataProcess>
                                           'Berat akhir tidak boleh lebih besar dari berat awal';
                                     }
                                   },
-                                  onChanged: (_) => setState(() {
-                                    final beratAkhir = item.beratAkhir;
-                                    final beratAwal = double.tryParse(item.beratAwal) ?? 0;
-                                    final susut = (beratAwal - beratAkhir) / beratAwal * 100;
-                                    item.susutCtrl.text = susut.toStringAsFixed(2);
-                                  }),
+                                  onChanged:
+                                      (_) => setState(() {
+                                        final beratAkhir = item.beratAkhir;
+                                        final beratAwal =
+                                            double.tryParse(item.beratAwal) ??
+                                            0;
+                                        final susut =
+                                            (beratAwal - beratAkhir) /
+                                            beratAwal *
+                                            100;
+                                        item.susutCtrl.text = susut
+                                            .toStringAsFixed(2);
+                                      }),
                                 ),
                               ),
                               const SizedBox(width: 10),
@@ -388,24 +394,29 @@ class _DataProcessState extends State<DataProcess>
                               ),
                             );
                           }
-                          : () async{
+                          : () async {
                             if (errorMessage == null || errorMessage! == "") {
-                              await editBatchWithDetails(
-                                batchId: "${batchId}_${_komposisiItems[0].label.split(' ').last}",
-                                metodeCuci: selectedMetodeCuci ?? '',
-                                komposisi: _komposisiItems[0].label.split(" ").last, 
-                                beratAkhir: _komposisiItems[0].beratAkhir.toString(),
-                              );
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Data berhasil disimpan'),
-                                ),
-                              );
-                            } else {
+                              for (int i = 0; i < _komposisiItems.length; i++) {
+                                await editBatchWithDetails(
+                                  batchId:
+                                      "${batchId}_${_komposisiItems[i].label.split(' ').last}",
+                                  metodeCuci: selectedMetodeCuci ?? '',
+                                  komposisi:
+                                      _komposisiItems[i].label.split(" ").last,
+                                  beratAkhir:
+                                      _komposisiItems[i].beratAkhir.toString(),
+                                );
+                              }
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text(errorMessage!),
+                                  content: Text('Data berhasil disimpan'),
+                                  backgroundColor: Colors.green,
                                 ),
+                              );
+                              Navigator.pop(context);
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(errorMessage!)),
                               );
                             }
                           },
