@@ -39,6 +39,37 @@ Future<String?> addBatchWithDetails({
       });
     }
 
+    if (batchName == 'Mangkok' || batchName == 'Kipas' || batchName == 'Sudut') {
+      await Supabase.instance.client.from('batches_details').insert({
+        'id': '${batchId}_Kaki',
+        'batch_id': batchId,
+        'komposisi': 'Kaki',
+        'berat': 0,
+        'harga': 0,
+      });
+      await Supabase.instance.client.from('batches_details').insert({
+        'id': '${batchId}_Patahan',
+        'batch_id': batchId,
+        'komposisi': 'Patahan',
+        'berat': 0,
+        'harga': 0,
+      });
+      await Supabase.instance.client.from('batches_details').insert({
+        'id': '${batchId}_Serat',
+        'batch_id': batchId,
+        'komposisi': 'Serat',
+        'berat': 0,
+        'harga': 0,
+      });
+      await Supabase.instance.client.from('batches_details').insert({
+        'id': '${batchId}_Bulu',
+        'batch_id': batchId,
+        'komposisi': 'Bulu',
+        'berat': 0,
+        'harga': 0,
+      });
+    }
+
     return batchId; // sukses semua
 
   } catch (error) {

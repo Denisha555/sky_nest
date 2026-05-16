@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/tambah_batch.dart';
 import 'services/get_batch.dart';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -175,7 +176,10 @@ class _DataBatchState extends State<DataBatch> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // TODO: navigasi ke halaman tambah batch
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const TambahBatch()),
+          );
         },
         backgroundColor: const Color(0xFF1565C0),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -463,9 +467,9 @@ class BatchDetails extends StatelessWidget {
             children: [
               Expanded(
                 child: _InfoTile(
-                  icon: Icons.tag_rounded,
-                  label: 'ID Batch',
-                  value: '${batch['id']}',
+                  icon: Icons.category_sharp,
+                  label: 'Jenis',
+                  value: '${batch['name']}',
                 ),
               ),
               const SizedBox(width: 10),
