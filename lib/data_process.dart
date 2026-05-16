@@ -196,20 +196,20 @@ class _DataProcessState extends State<DataProcess> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
-      appBar: AppBar(
-        title: const Text(
-          'Data Process',
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
-        ),
-        backgroundColor:  const Color(0xFF1565C0),
-        foregroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: true,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Divider(height: 1, color: Colors.grey.shade200),
-        ),
-      ),
+      // appBar: AppBar(
+      //   title: const Text(
+      //     'Data Process',
+      //     style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+      //   ),
+      //   backgroundColor:  const Color(0xFF1565C0),
+      //   foregroundColor: Colors.white,
+      //   elevation: 0,
+      //   centerTitle: true,
+      //   bottom: PreferredSize(
+      //     preferredSize: const Size.fromHeight(1),
+      //     child: Divider(height: 1, color: Colors.grey.shade200),
+      //   ),
+      // ),
       body: _isLoading && _dataBatch.isEmpty
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(

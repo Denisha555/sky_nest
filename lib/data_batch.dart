@@ -164,16 +164,16 @@ class _DataBatchState extends State<DataBatch> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
-      appBar: AppBar(
-        title: const Text(
-          'Data Batch',
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 17),
-        ),
-        backgroundColor: const Color(0xFF1565C0),
-        foregroundColor: Colors.white,
-        centerTitle: true,
-        elevation: 0,
-      ),
+      // appBar: AppBar(
+      //   title: const Text(
+      //     'Data Batch',
+      //     style: TextStyle(fontWeight: FontWeight.w600, fontSize: 17),
+      //   ),
+      //   backgroundColor: const Color(0xFF1565C0),
+      //   foregroundColor: Colors.white,
+      //   centerTitle: true,
+      //   elevation: 0,
+      // ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.pushReplacement(
@@ -190,7 +190,7 @@ class _DataBatchState extends State<DataBatch> {
           // ── Search bar ──────────────────────────────────────────────────
           Container(
             color: const Color(0xFF1565C0),
-            padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+            padding: const EdgeInsets.fromLTRB(14, 15, 14, 14),
             child: TextField(
               controller: _searchCtrl,
               style: const TextStyle(fontSize: 14),

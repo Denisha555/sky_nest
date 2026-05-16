@@ -4,6 +4,7 @@ import 'package:flutter_application_1/tambah_batch.dart';
 import 'package:flutter_application_1/data_batch.dart';
 import 'package:flutter_application_1/data_process.dart';
 import 'package:flutter_application_1/data_margin.dart';
+import 'package:flutter_application_1/laporan.dart';
 
 class PilihHalaman extends StatefulWidget {
   const PilihHalaman({super.key});
@@ -21,7 +22,7 @@ class _PilihHalamanState extends State<PilihHalaman> {
     const DataBatch(),
     const DataProcess(),
     const DataMargin(),
-  //  const LaporanPage(),
+    const Laporan(),
   ];
 
   final List<String> _titles = [
@@ -36,28 +37,47 @@ class _PilihHalamanState extends State<PilihHalaman> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // ================= APPBAR =================
       appBar: AppBar(
+        // Tombol kembali
+        leading: _selectedIndex != 0
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () {
+                  setState(() {
+                    _selectedIndex = 0;
+                  });
+                },
+              )
+            : null,
+
         title: Text(_titles[_selectedIndex]),
         centerTitle: true,
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
+
         actions: [
           IconButton(
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const ProfilePage(),
+                  builder: (context) =>
+                      const ProfilePage(),
                 ),
               );
             },
-            icon: const Icon(Icons.account_circle),
+            icon: const Icon(
+              Icons.account_circle,
+            ),
           ),
         ],
       ),
+      // ================= BODY =================
 
       body: _pages[_selectedIndex],
 
+ // ================= NAVBAR BAWAH =================
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         type: BottomNavigationBarType.fixed,
@@ -228,75 +248,19 @@ class DashboardPage extends StatelessWidget {
 
 // // ===================== HALAMAN =====================
 
-// class TambahBatchPage extends StatelessWidget {
-//   const TambahBatchPage({super.key});
+class LaporanPage extends StatelessWidget {
+  const LaporanPage({super.key});
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return const Center(
-//       child: Text(
-//         'Halaman Tambah Batch',
-//         style: TextStyle(fontSize: 22),
-//       ),
-//     );
-//   }
-// }
-
-// class DataBatchPage extends StatelessWidget {
-//   const DataBatchPage({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return const Center(
-//       child: Text(
-//         'Halaman Data Batch',
-//         style: TextStyle(fontSize: 22),
-//       ),
-//     );
-//   }
-// }
-
-// class DataProsesPage extends StatelessWidget {
-//   const DataProsesPage({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return const Center(
-//       child: Text(
-//         'Halaman Data Proses',
-//         style: TextStyle(fontSize: 22),
-//       ),
-//     );
-//   }
-// }
-
-// class DataMarginPage extends StatelessWidget {
-//   const DataMarginPage({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return const Center(
-//       child: Text(
-//         'Halaman Data Margin',
-//         style: TextStyle(fontSize: 22),
-//       ),
-//     );
-//   }
-// }
-
-// class LaporanPage extends StatelessWidget {
-//   const LaporanPage({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return const Center(
-//       child: Text(
-//         'Halaman Laporan',
-//         style: TextStyle(fontSize: 22),
-//       ),
-//     );
-//   }
-// }
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Text(
+        'Halaman Laporan',
+        style: TextStyle(fontSize: 22),
+      ),
+    );
+  }
+}
 
 // ===================== PROFILE =====================
 

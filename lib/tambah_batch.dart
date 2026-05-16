@@ -323,17 +323,17 @@ class _TambahBatchState extends State<TambahBatch> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Tambah Batch'),
-        backgroundColor: Colors.blue.shade700,
-        centerTitle: true,
-        titleTextStyle: const TextStyle(
-          color: Colors.white,
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-        ),
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
+      // appBar: AppBar(
+      //   title: const Text('Tambah Batch'),
+      //   backgroundColor: Colors.blue.shade700,
+      //   centerTitle: true,
+      //   titleTextStyle: const TextStyle(
+      //     color: Colors.white,
+      //     fontSize: 18,
+      //     fontWeight: FontWeight.bold,
+      //   ),
+      //   iconTheme: const IconThemeData(color: Colors.white),
+      // ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(

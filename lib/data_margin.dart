@@ -30,10 +30,10 @@ class _DataMarginState extends State<DataMargin> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Data Margin', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18)),
-        centerTitle: true,
-      ),
+      // appBar: AppBar(
+      //   title: Text('Data Margin', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18)),
+      //   centerTitle: true,
+      // ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
