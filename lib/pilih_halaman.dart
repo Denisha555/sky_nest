@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/dashboard.dart';
-import 'package:flutter_application_1/tambah_batch.dart';
-import 'package:flutter_application_1/data_batch.dart';
+//import 'package:flutter_application_1/tambah_batch.dart';
+//import 'package:flutter_application_1/data_batch.dart';
 import 'package:flutter_application_1/data_process.dart';
 import 'package:flutter_application_1/data_margin.dart';
 import 'package:flutter_application_1/laporan.dart';
@@ -18,8 +18,8 @@ class _PilihHalamanState extends State<PilihHalaman> {
 
   final List<Widget> _pages = [
     const Dashboard(),
-    const TambahBatch(),
-    const DataBatch(),
+    //const TambahBatch(),
+    //const DataBatch(),
     const DataProcess(),
     const DataMargin(),
     const Laporan(),
@@ -27,8 +27,8 @@ class _PilihHalamanState extends State<PilihHalaman> {
 
   final List<String> _titles = [
     'Dashboard',
-    'Tambah Batch',
-    'Data Batch',
+    //'Tambah Batch',
+    //'Data Batch',
     'Data Proses',
     'Data Margin',
     'Laporan',
@@ -95,14 +95,14 @@ class _PilihHalamanState extends State<PilihHalaman> {
             icon: Icon(Icons.dashboard),
             label: 'Dashboard',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add_box),
-            label: 'Tambah Batch',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.inventory),
-            label: 'Data Batch',
-          ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.add_box),
+          //   label: 'Tambah Batch',
+          // ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.inventory),
+          //   label: 'Data Batch',
+          // ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
             label: 'Data Proses',
