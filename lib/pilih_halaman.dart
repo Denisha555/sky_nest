@@ -5,6 +5,7 @@ import 'package:flutter_application_1/dashboard.dart';
 import 'package:flutter_application_1/data_process.dart';
 import 'package:flutter_application_1/data_margin.dart';
 import 'package:flutter_application_1/laporan.dart';
+import 'package:flutter_application_1/profil.dart';
 
 class PilihHalaman extends StatefulWidget {
   const PilihHalaman({super.key});
@@ -63,7 +64,7 @@ class _PilihHalamanState extends State<PilihHalaman> {
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      const ProfilePage(),
+                      const HalamanProfil(),
                 ),
               );
             },
@@ -246,7 +247,7 @@ class DashboardPage extends StatelessWidget {
   }
 }
 
-// // ===================== HALAMAN =====================
+// // ===================== HALAMAN LAPORAN =====================
 
 class LaporanPage extends StatelessWidget {
   const LaporanPage({super.key});
@@ -262,43 +263,6 @@ class LaporanPage extends StatelessWidget {
   }
 }
 
-// ===================== PROFILE =====================
-
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profil'),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-      ),
-      body: const Center(
-        child: Text(
-          'Halaman Profil',
-          style: TextStyle(fontSize: 22),
-        ),
-      ),
-    );
-  }
-}
 
 
 
-// import 'package:flutter/material.dart';
-
-// class PilihHalaman extends StatefulWidget {
-//   const PilihHalaman({super.key});
-
-//   @override
-//   State<PilihHalaman> createState() => _PilihHalamanState();
-// }
-
-// class _PilihHalamanState extends State<PilihHalaman> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return const Placeholder();
-//   }
-// }
