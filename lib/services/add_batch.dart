@@ -14,9 +14,9 @@ Future<String?> addBatchWithDetails({
     // Generate batch ID (sama seperti sebelumnya)
     final data = await checkBatch("${date}_$batchName");
     if (data.isNotEmpty) {
-      batchId = "${date}_${batchName}_${(data.length + 1).toString().padLeft(2, '0')}";
+      batchId = "${date}_${batchName}_${supplier}_${(data.length + 1).toString().padLeft(2, '0')}";
     } else {
-      batchId = "${date}_${batchName}_01";
+      batchId = "${date}_${batchName}_${supplier}_01";
     }
 
     // Insert batch dulu

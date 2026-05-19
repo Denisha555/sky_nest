@@ -13,15 +13,42 @@ class _DataMarginState extends State<DataMargin> {
   List<Map<String, dynamic>> batch = [];
 
   String? selectedBatch;
+  int hargaBeli = 0;
+
   TextEditingController ongkosCuciCtrl = TextEditingController(text: "0");
   TextEditingController ongkosKirimCtrl = TextEditingController(text: "0");
   TextEditingController biayaLainCtrl = TextEditingController(text: "0");
   TextEditingController hargaJualCtrl = TextEditingController(text: "0");
 
+  // FIX 1: Hitung totalBiaya secara dinamis dari nilai controller
+  int get totalBiaya {
+    final cuci = int.tryParse(ongkosCuciCtrl.text) ?? 0;
+    final kirim = int.tryParse(ongkosKirimCtrl.text) ?? 0;
+    final lain = int.tryParse(biayaLainCtrl.text) ?? 0;
+    return cuci + kirim + lain;
+  }
+
+  int get hargaJual => int.tryParse(hargaJualCtrl.text) ?? 0;
+
+  int get profit => hargaJual - totalBiaya;
+
+  // FIX 2: Hindari division by zero
+  double get marginPersen => totalBiaya == 0 ? 0 : (profit / totalBiaya) * 100;
+
   @override
   void initState() {
     super.initState();
     _getBatchData();
+
+    // FIX 3: Tambahkan listener agar UI kalkulasi terupdate saat input berubah
+    ongkosCuciCtrl.addListener(_onFieldChanged);
+    ongkosKirimCtrl.addListener(_onFieldChanged);
+    biayaLainCtrl.addListener(_onFieldChanged);
+    hargaJualCtrl.addListener(_onFieldChanged);
+  }
+
+  void _onFieldChanged() {
+    setState(() {});
   }
 
   Future<void> _getBatchData() async {
@@ -38,6 +65,17 @@ class _DataMarginState extends State<DataMargin> {
     biayaLainCtrl.dispose();
     hargaJualCtrl.dispose();
     super.dispose();
+  }
+
+  // FIX 4: Validator yang benar menggunakan int.tryParse
+  String? _validateAngka(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Wajib diisi';
+    }
+    if (int.tryParse(value) == null) {
+      return 'Harus berupa angka';
+    }
+    return null;
   }
 
   @override
@@ -58,11 +96,11 @@ class _DataMarginState extends State<DataMargin> {
                 const SizedBox(height: 6),
                 DropdownButtonFormField<String>(
                   value: selectedBatch,
-                  hint: Text('Pilih Batch'),
-                  decoration: InputDecoration(
+                  hint: const Text('Pilih Batch'),
+                  decoration: const InputDecoration(
                     isDense: true,
                     border: OutlineInputBorder(),
-                    contentPadding: const EdgeInsets.symmetric(
+                    contentPadding: EdgeInsets.symmetric(
                       horizontal: 12,
                       vertical: 12,
                     ),
@@ -72,7 +110,7 @@ class _DataMarginState extends State<DataMargin> {
                           .map(
                             (b) => DropdownMenuItem(
                               value:
-                                  "${b['supplier']} - ${b['name']} - ${b['date']}",
+                                  "${b["id"]}",
                               child: Text(
                                 "${b['supplier']} - ${b['name']} - ${b['date']}",
                                 style: const TextStyle(fontSize: 14),
@@ -85,79 +123,15 @@ class _DataMarginState extends State<DataMargin> {
                           value == null || value.isEmpty
                               ? 'Pilih batch terlebih dahulu'
                               : null,
-                  onChanged: (value) {
+                  onChanged: (value) async {
+                    List<Map<String, dynamic>> temp = await getBatchDetails(value!);
                     setState(() {
                       selectedBatch = value;
                     });
                   },
                 ),
                 const SizedBox(height: 20),
-                const Text(
-                  "Ongkos Cuci (Rp)",
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 6),
-                TextFormField(
-                  controller: ongkosCuciCtrl,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    isDense: true,
-                    hintText: 'Masukkan Ongkos Cuci',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Wajib diisi';
-                    } else if (int.parse(value) == Null) {
-                      return 'Harus berupa angka';
-                    }
-                  },
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  "Ongkos Kirim (Rp)",
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 6),
-                TextFormField(
-                  controller: ongkosKirimCtrl,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    isDense: true,
-                    hintText: 'Masukkan Ongkos Kirim',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Wajib diisi';
-                    } else if (int.parse(value) == null) {
-                      return 'Harus berupa angka';
-                    }
-                  },
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  "Biaya Lain (Rp)",
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 6),
-                TextFormField(
-                  controller: biayaLainCtrl,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    isDense: true,
-                    hintText: 'Masukkan Biaya Lain',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Wajib diisi';
-                    } else if (int.parse(value) == null) {
-                      return 'Harus berupa angka';
-                    }
-                  },
-                ),
-                const SizedBox(height: 20),
+
                 const Text(
                   "Harga Jual (Rp)",
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
@@ -166,18 +140,64 @@ class _DataMarginState extends State<DataMargin> {
                 TextFormField(
                   controller: hargaJualCtrl,
                   keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     isDense: true,
                     hintText: 'Masukkan Harga Jual',
                     border: OutlineInputBorder(),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Wajib diisi';
-                    } else if (int.parse(value) == null) {
-                      return 'Harus berupa angka';
-                    }
-                  },
+                  validator: _validateAngka,
+                ),
+
+                SizedBox(height: 20),
+
+                const Text(
+                  "Ongkos Cuci (Rp)",
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 6),
+                TextFormField(
+                  controller: ongkosCuciCtrl,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    isDense: true,
+                    hintText: 'Masukkan Ongkos Cuci',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: _validateAngka,
+                ),
+                const SizedBox(height: 20),
+
+                const Text(
+                  "Ongkos Kirim (Rp)",
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 6),
+                TextFormField(
+                  controller: ongkosKirimCtrl,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    isDense: true,
+                    hintText: 'Masukkan Ongkos Kirim',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: _validateAngka,
+                ),
+                const SizedBox(height: 20),
+
+                const Text(
+                  "Biaya Lain (Rp)",
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 6),
+                TextFormField(
+                  controller: biayaLainCtrl,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    isDense: true,
+                    hintText: 'Masukkan Biaya Lain',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: _validateAngka,
                 ),
                 const SizedBox(height: 28),
 
@@ -186,8 +206,15 @@ class _DataMarginState extends State<DataMargin> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Perhitungan Margin", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold,), textAlign: TextAlign.start,),
-                      SizedBox(height: 10),
+                      const Text(
+                        "Perhitungan Margin",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.start,
+                      ),
+                      const SizedBox(height: 10),
                       Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
@@ -197,20 +224,129 @@ class _DataMarginState extends State<DataMargin> {
                         ),
                         padding: const EdgeInsets.all(12),
                         child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Container(
-                              
                               width: double.infinity,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                color: Colors.blue.shade800,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
                               ),
-                              child: Text("Total Biaya")
-                            )
-                          ]
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(4),
+                                color: Colors.blue.shade700,
+                              ),
+                              child: const Text(
+                                "Total Biaya",
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            // FIX 5: Gunakan getter totalBiaya
+                            Text("Total Biaya : Rp $totalBiaya"),
+
+                            const SizedBox(height: 15),
+
+
+
+                            const SizedBox(height: 15,),
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(4),
+                                color: Colors.blue.shade700,
+                              ),
+                              child: const Text(
+                                "Harga Jual",
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text("Harga Jual : Rp $hargaJual"),
+                          ],
                         ),
                       ),
-                      SizedBox(height: 20,)
+                      const SizedBox(height: 10),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(4),
+                          color: Colors.blue.shade700,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const Text(
+                                  "Profit",
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                // FIX 6: Gunakan getter profit
+                                Text(
+                                  "Rp $profit",
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Container(
+                              width: 1,
+                              height: 36,
+                              color: Colors.white38,
+                            ),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const Text(
+                                  "Margin",
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                // FIX 7: Gunakan getter marginPersen, format 2 desimal
+                                Text(
+                                  "${marginPersen.toStringAsFixed(2)}%",
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
                     ],
                   ),
 
