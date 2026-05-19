@@ -6,6 +6,7 @@ import 'package:flutter_application_1/data_batch.dart';
 import 'package:flutter_application_1/data_process.dart';
 import 'package:flutter_application_1/data_margin.dart';
 import 'package:flutter_application_1/laporan.dart';
+import 'package:flutter_application_1/profil.dart';
 
 class PilihHalaman extends StatefulWidget {
   const PilihHalaman({super.key});
@@ -19,8 +20,8 @@ class _PilihHalamanState extends State<PilihHalaman> {
 
   final List<Widget> _pages = [
     const Dashboard(),
-    const TambahBatch(),
-    const DataBatch(),
+    //const TambahBatch(),
+    //const DataBatch(),
     const DataProcess(),
     const DataMargin(),
     const Laporan(),
@@ -28,8 +29,8 @@ class _PilihHalamanState extends State<PilihHalaman> {
 
   final List<String> _titles = [
     'Dashboard',
-    'Tambah Batch',
-    'Data Batch',
+    //'Tambah Batch',
+    //'Data Batch',
     'Data Proses',
     'Hitung Margin',
     'Laporan',
@@ -53,7 +54,7 @@ class _PilihHalamanState extends State<PilihHalaman> {
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      const Profile(), 
+                      const HalamanProfil(),
                 ),
               );
             },
@@ -87,14 +88,14 @@ class _PilihHalamanState extends State<PilihHalaman> {
             icon: Icon(Icons.dashboard),
             label: 'Dashboard',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add_box),
-            label: 'Tambah Batch',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.inventory),
-            label: 'Data Batch',
-          ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.add_box),
+          //   label: 'Tambah Batch',
+          // ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.inventory),
+          //   label: 'Data Batch',
+          // ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
             label: 'Data Proses',
@@ -238,7 +239,7 @@ class _PilihHalamanState extends State<PilihHalaman> {
 //   }
 // }
 
-// // ===================== HALAMAN =====================
+// // ===================== HALAMAN LAPORAN =====================
 
 // class LaporanPage extends StatelessWidget {
 //   const LaporanPage({super.key});
