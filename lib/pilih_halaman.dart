@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/dashboard.dart';
+import 'package:flutter_application_1/profile.dart';
 import 'package:flutter_application_1/tambah_batch.dart';
 import 'package:flutter_application_1/data_batch.dart';
 import 'package:flutter_application_1/data_process.dart';
@@ -30,7 +31,7 @@ class _PilihHalamanState extends State<PilihHalaman> {
     'Tambah Batch',
     'Data Batch',
     'Data Proses',
-    'Data Margin',
+    'Hitung Margin',
     'Laporan',
   ];
 
@@ -39,17 +40,6 @@ class _PilihHalamanState extends State<PilihHalaman> {
     return Scaffold(
       // ================= APPBAR =================
       appBar: AppBar(
-        // Tombol kembali
-        leading: _selectedIndex != 0
-            ? IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () {
-                  setState(() {
-                    _selectedIndex = 0;
-                  });
-                },
-              )
-            : null,
 
         title: Text(_titles[_selectedIndex]),
         centerTitle: true,
@@ -63,12 +53,14 @@ class _PilihHalamanState extends State<PilihHalaman> {
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      const ProfilePage(),
+                      const Profile(), 
                 ),
               );
             },
             icon: const Icon(
               Icons.account_circle,
+              size: 35,
+              color: Colors.white,
             ),
           ),
         ],
@@ -109,7 +101,7 @@ class _PilihHalamanState extends State<PilihHalaman> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.attach_money),
-            label: 'Data Margin',
+            label: 'Hitung Margin',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.description),
@@ -121,184 +113,145 @@ class _PilihHalamanState extends State<PilihHalaman> {
   }
 }
 
-// ===================== DASHBOARD =====================
+// // ===================== DASHBOARD =====================
 
-class DashboardPage extends StatelessWidget {
-  const DashboardPage({super.key});
+// class DashboardPage extends StatelessWidget {
+//   const DashboardPage({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            buildCard(
-              title: 'Total Batch',
-              value: '10',
-              color: Colors.blue,
-            ),
+//   @override
+//   Widget build(BuildContext context) {
+//     return SingleChildScrollView(
+//       child: Padding(
+//         padding: const EdgeInsets.all(16),
+//         child: Column(
+//           children: [
+//             buildCard(
+//               title: 'Total Batch',
+//               value: '10',
+//               color: Colors.blue,
+//             ),
 
-            const SizedBox(height: 10),
+//             const SizedBox(height: 10),
 
-            buildCard(
-              title: 'Total Modal',
-              value: '50.000.000',
-              color: Colors.green,
-            ),
+//             buildCard(
+//               title: 'Total Modal',
+//               value: '50.000.000',
+//               color: Colors.green,
+//             ),
 
-            const SizedBox(height: 10),
+//             const SizedBox(height: 10),
 
-            buildCard(
-              title: 'Total Penjualan',
-              value: '100.000.000',
-              color: Colors.orange,
-            ),
+//             buildCard(
+//               title: 'Total Penjualan',
+//               value: '100.000.000',
+//               color: Colors.orange,
+//             ),
 
-            const SizedBox(height: 10),
+//             const SizedBox(height: 10),
 
-            buildCard(
-              title: 'Total Profit',
-              value: '50.000.000',
-              color: Colors.red,
-            ),
+//             buildCard(
+//               title: 'Total Profit',
+//               value: '50.000.000',
+//               color: Colors.red,
+//             ),
 
-            const SizedBox(height: 20),
+//             const SizedBox(height: 20),
 
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 18,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(15),
-                border: Border.all(
-                  color: Colors.grey.shade300,
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment:
-                    MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text(
-                    'Shrinkage Rata-rata:',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    '10%',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+//             Container(
+//               width: double.infinity,
+//               padding: const EdgeInsets.symmetric(
+//                 horizontal: 16,
+//                 vertical: 18,
+//               ),
+//               decoration: BoxDecoration(
+//                 color: Colors.grey.shade200,
+//                 borderRadius: BorderRadius.circular(15),
+//                 border: Border.all(
+//                   color: Colors.grey.shade300,
+//                 ),
+//               ),
+//               child: Row(
+//                 mainAxisAlignment:
+//                     MainAxisAlignment.spaceBetween,
+//                 children: const [
+//                   Text(
+//                     'Shrinkage Rata-rata:',
+//                     style: TextStyle(
+//                       fontSize: 20,
+//                       fontWeight: FontWeight.bold,
+//                     ),
+//                   ),
+//                   Text(
+//                     '10%',
+//                     style: TextStyle(
+//                       fontSize: 20,
+//                       fontWeight: FontWeight.bold,
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
 
-  Widget buildCard({
-    required String title,
-    required String value,
-    required Color color,
-  }) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 18,
-      ),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Row(
-        mainAxisAlignment:
-            MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Text(
-            value,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
+//   Widget buildCard({
+//     required String title,
+//     required String value,
+//     required Color color,
+//   }) {
+//     return Container(
+//       width: double.infinity,
+//       padding: const EdgeInsets.symmetric(
+//         horizontal: 16,
+//         vertical: 18,
+//       ),
+//       decoration: BoxDecoration(
+//         color: color,
+//         borderRadius: BorderRadius.circular(15),
+//       ),
+//       child: Row(
+//         mainAxisAlignment:
+//             MainAxisAlignment.spaceBetween,
+//         children: [
+//           Text(
+//             title,
+//             style: const TextStyle(
+//               color: Colors.white,
+//               fontSize: 20,
+//               fontWeight: FontWeight.bold,
+//             ),
+//           ),
+//           Text(
+//             value,
+//             style: const TextStyle(
+//               color: Colors.white,
+//               fontSize: 20,
+//               fontWeight: FontWeight.bold,
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
 
 // // ===================== HALAMAN =====================
 
-class LaporanPage extends StatelessWidget {
-  const LaporanPage({super.key});
+// class LaporanPage extends StatelessWidget {
+//   const LaporanPage({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text(
-        'Halaman Laporan',
-        style: TextStyle(fontSize: 22),
-      ),
-    );
-  }
-}
-
-// ===================== PROFILE =====================
-
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profil'),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-      ),
-      body: const Center(
-        child: Text(
-          'Halaman Profil',
-          style: TextStyle(fontSize: 22),
-        ),
-      ),
-    );
-  }
-}
-
-
-
-// import 'package:flutter/material.dart';
-
-// class PilihHalaman extends StatefulWidget {
-//   const PilihHalaman({super.key});
-
-//   @override
-//   State<PilihHalaman> createState() => _PilihHalamanState();
-// }
-
-// class _PilihHalamanState extends State<PilihHalaman> {
 //   @override
 //   Widget build(BuildContext context) {
-//     return const Placeholder();
+//     return const Center(
+//       child: Text(
+//         'Halaman Laporan',
+//         style: TextStyle(fontSize: 22),
+//       ),
+//     );
 //   }
 // }
+
+

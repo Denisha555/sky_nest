@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/dashboard.dart';
+import 'package:flutter_application_1/pilih_halaman.dart';
 import 'package:flutter_application_1/services/check_user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -76,7 +77,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
         );
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => Dashboard()),
+          MaterialPageRoute(builder: (context) => PilihHalaman()),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -221,7 +222,11 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                                       if (value == null || value.isEmpty) {
                                         return 'Password tidak boleh kosong';
                                       }
+
                                       return null;
+                                    },
+                                    onFieldSubmitted: (_) {
+                                      if (!isLoading) _handleLogin();
                                     },
                                   ),
                                   const SizedBox(height: 20),

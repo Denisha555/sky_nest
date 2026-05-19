@@ -176,12 +176,12 @@ class _DataBatchState extends State<DataBatch> {
       // ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushReplacement(
+          Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const TambahBatch()),
           );
         },
-        backgroundColor: const Color(0xFF1565C0),
+        backgroundColor: Colors.blue,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         child: const Icon(Icons.add, color: Colors.white),
       ),
@@ -189,7 +189,7 @@ class _DataBatchState extends State<DataBatch> {
         children: [
           // ── Search bar ──────────────────────────────────────────────────
           Container(
-            color: const Color(0xFF1565C0),
+            color: Colors.blue,
             padding: const EdgeInsets.fromLTRB(14, 15, 14, 14),
             child: TextField(
               controller: _searchCtrl,

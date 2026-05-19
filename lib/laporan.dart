@@ -14,10 +14,7 @@ class _LaporanState extends State<Laporan> {
       body: Center(
         child: Text(
           'Halaman Laporan',
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-          ),
+         
         ),
       ),
     );
