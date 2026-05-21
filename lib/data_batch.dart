@@ -162,23 +162,25 @@ class _DataBatchState extends State<DataBatch> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return SafeArea(
+      child: Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
-      appBar: AppBar(
-        title: const Text(
-          'Data Batch',
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 17),
-        ),
-        backgroundColor: const Color(0xFF1565C0),
-        foregroundColor: Colors.white,
-        centerTitle: true,
-        elevation: 0,
-      ),
+      // appBar: AppBar(
+      //   title: const Text(
+      //     'Data Batch',
+      //     style: TextStyle(fontWeight: FontWeight.w600, fontSize: 17),
+      //   ),
+      //   backgroundColor: const Color(0xFF1565C0),
+      //   foregroundColor: Colors.white,
+      //   centerTitle: true,
+      //   elevation: 0,
+      // ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const TambahBatch()),
+            MaterialPageRoute(builder: (_) => const TambahBatch(),
+          ),
           );
         },
         backgroundColor: Colors.blue,
@@ -242,6 +244,7 @@ class _DataBatchState extends State<DataBatch> {
                   ),
           ),
         ],
+      ),
       ),
     );
   }

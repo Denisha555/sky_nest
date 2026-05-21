@@ -21,7 +21,7 @@ class _PilihHalamanState extends State<PilihHalaman> {
   final List<Widget> _pages = [
     const Dashboard(),
     //const TambahBatch(),
-    //const DataBatch(),
+    const DataBatch(),
     const DataProcess(),
     const DataMargin(),
     const Laporan(),
@@ -30,7 +30,7 @@ class _PilihHalamanState extends State<PilihHalaman> {
   final List<String> _titles = [
     'Dashboard',
     //'Tambah Batch',
-    //'Data Batch',
+    'Data Batch',
     'Data Proses',
     'Hitung Margin',
     'Laporan',
@@ -92,17 +92,17 @@ class _PilihHalamanState extends State<PilihHalaman> {
           //   icon: Icon(Icons.add_box),
           //   label: 'Tambah Batch',
           // ),
-          // BottomNavigationBarItem(
-          //   icon: Icon(Icons.inventory),
-          //   label: 'Data Batch',
-          // ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.inventory),
+            label: 'Data Batch',
+          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
             label: 'Data Proses',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.attach_money),
-            label: 'Hitung Margin',
+            label: 'Margin',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.description),
