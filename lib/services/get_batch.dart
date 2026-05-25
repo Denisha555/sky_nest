@@ -35,4 +35,6 @@ Future<List<Map<String, dynamic>>> getBatchDetails(String batchId) async {
     print('Error fetching batch details: $e');
     return [];
   }
+
+  
 }
