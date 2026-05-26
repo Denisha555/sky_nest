@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-// import 'package:flutter_application_1/dashboard.dart';
 import 'package:flutter_application_1/pilih_halaman.dart';
 import 'package:flutter_application_1/login.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
