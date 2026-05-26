@@ -399,281 +399,311 @@ class _LaporanState extends State<Laporan> {
     );
   }
 
-  // ================= GRAFIK =================
+// ================= GRAFIK =================
 
-  Widget buildProfitChart() {
-    List<FlSpot> penjualanSpots = [];
-    List<FlSpot> pembelianSpots = [];
-    List<FlSpot> pengeluaranSpots = [];
-    List<FlSpot> profitSpots = [];
+Widget buildProfitChart() {
+  List<FlSpot> penjualanSpots = [];
+  List<FlSpot> pembelianSpots = [];
+  List<FlSpot> pengeluaranSpots = [];
+  List<FlSpot> profitSpots = [];
 
-    double totalBeli = 0;
-    double totalJual = 0;
-    double totalKeluar = 0;
-    double totalUntung = 0;
+  double totalBeli = 0;
+  double totalJual = 0;
+  double totalKeluar = 0;
+  double totalUntung = 0;
 
-    for (int i = 0; i < batches.length; i++) {
-      final batchId = batches[i]['id'].toString();
+  for (int i = 0; i < batches.length; i++) {
+    final batchId = batches[i]['id'].toString();
 
-      double batchTotal =
-          getTotalBatch(batchId);
+    double batchTotal =
+        getTotalBatch(batchId);
 
-      totalBeli += batchTotal;
-
-      totalJual = totalBeli * 1.25;
-
-      totalKeluar = totalBeli * 0.05;
-
-      totalUntung =
-          totalJual -
-          totalBeli -
-          totalKeluar;
-
-      penjualanSpots.add(
-        FlSpot(
-          i.toDouble(),
-          totalJual / 1000000,
-        ),
-      );
-
-      pembelianSpots.add(
-        FlSpot(
-          i.toDouble(),
-          totalBeli / 1000000,
-        ),
-      );
-
-      pengeluaranSpots.add(
-        FlSpot(
-          i.toDouble(),
-          totalKeluar / 1000000,
-        ),
-      );
-
-      profitSpots.add(
-        FlSpot(
-          i.toDouble(),
-          totalUntung / 1000000,
-        ),
-      );
+    // pengaman data error
+    if (batchTotal.isNaN ||
+        batchTotal.isInfinite) {
+      batchTotal = 0;
     }
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(18),
+    totalBeli += batchTotal;
 
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius:
-            BorderRadius.circular(18),
+    totalJual = totalBeli * 1.25;
 
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(
-              0.05,
-            ),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+    totalKeluar = totalBeli * 0.05;
+
+    totalUntung =
+        totalJual -
+        totalBeli -
+        totalKeluar;
+
+    penjualanSpots.add(
+      FlSpot(
+        i.toDouble(),
+        totalJual / 1000000,
       ),
+    );
 
-      child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
+    pembelianSpots.add(
+      FlSpot(
+        i.toDouble(),
+        totalBeli / 1000000,
+      ),
+    );
 
-        children: [
-          const Text(
-            'Grafik Profit',
+    pengeluaranSpots.add(
+      FlSpot(
+        i.toDouble(),
+        totalKeluar / 1000000,
+      ),
+    );
 
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-
-          const SizedBox(height: 6),
-
-          const Text(
-            'Analisis pembelian, penjualan, pengeluaran dan profit',
-
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey,
-            ),
-          ),
-
-          const SizedBox(height: 24),
-
-          SizedBox(
-            height: 300,
-
-            child: LineChart(
-              LineChartData(
-                minX: 0,
-
-                maxX: batches.isEmpty
-                    ? 0
-                    : (batches.length - 1)
-                        .toDouble(),
-
-                minY: 0,
-
-                gridData: FlGridData(
-                  show: true,
-                  drawVerticalLine: false,
-                ),
-
-                borderData:
-                    FlBorderData(show: false),
-
-                titlesData: FlTitlesData(
-                  topTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: false,
-                    ),
-                  ),
-
-                  rightTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: false,
-                    ),
-                  ),
-
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-
-                      getTitlesWidget:
-                          (value, meta) {
-                        return Padding(
-                          padding:
-                              const EdgeInsets.only(
-                                top: 8,
-                              ),
-
-                          child: Text(
-                            '${value.toInt() + 1}',
-                            style:
-                                const TextStyle(
-                                  fontSize: 11,
-                                ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-
-                      reservedSize: 40,
-
-                      getTitlesWidget:
-                          (value, meta) {
-                        return Text(
-                          '${value.toInt()} jt',
-
-                          style:
-                              const TextStyle(
-                                fontSize: 10,
-                              ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-
-                lineBarsData: [
-                  // PENJUALAN
-
-                  LineChartBarData(
-                    spots: penjualanSpots,
-                    isCurved: true,
-                    color: Colors.green,
-                    barWidth: 4,
-
-                    dotData: FlDotData(
-                      show: true,
-                    ),
-                  ),
-
-                  // PEMBELIAN
-
-                  LineChartBarData(
-                    spots: pembelianSpots,
-                    isCurved: true,
-                    color: Colors.red,
-                    barWidth: 4,
-
-                    dotData: FlDotData(
-                      show: true,
-                    ),
-                  ),
-
-                  // PENGELUARAN
-
-                  LineChartBarData(
-                    spots: pengeluaranSpots,
-                    isCurved: true,
-                    color: Colors.orange,
-                    barWidth: 4,
-
-                    dotData: FlDotData(
-                      show: true,
-                    ),
-                  ),
-
-                  // PROFIT
-
-                  LineChartBarData(
-                    spots: profitSpots,
-                    isCurved: true,
-                    color: Colors.blue,
-                    barWidth: 4,
-
-                    dotData: FlDotData(
-                      show: true,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          Wrap(
-            spacing: 16,
-            runSpacing: 10,
-
-            children: [
-              buildLegend(
-                Colors.green,
-                'Penjualan',
-              ),
-
-              buildLegend(
-                Colors.red,
-                'Pembelian',
-              ),
-
-              buildLegend(
-                Colors.orange,
-                'Pengeluaran',
-              ),
-
-              buildLegend(
-                Colors.blue,
-                'Profit',
-              ),
-            ],
-          ),
-        ],
+    profitSpots.add(
+      FlSpot(
+        i.toDouble(),
+        totalUntung / 1000000,
       ),
     );
   }
+
+  // wajib minimal 2 titik supaya fl_chart tidak error
+  if (penjualanSpots.length < 2) {
+    penjualanSpots = [
+      const FlSpot(0, 0),
+      const FlSpot(1, 0),
+    ];
+
+    pembelianSpots = [
+      const FlSpot(0, 0),
+      const FlSpot(1, 0),
+    ];
+
+    pengeluaranSpots = [
+      const FlSpot(0, 0),
+      const FlSpot(1, 0),
+    ];
+
+    profitSpots = [
+      const FlSpot(0, 0),
+      const FlSpot(1, 0),
+    ];
+  }
+
+  return Container(
+    width: double.infinity,
+    padding: const EdgeInsets.all(18),
+
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius:
+          BorderRadius.circular(18),
+
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(
+            0.05,
+          ),
+          blurRadius: 10,
+          offset: const Offset(0, 4),
+        ),
+      ],
+    ),
+
+    child: Column(
+      crossAxisAlignment:
+          CrossAxisAlignment.start,
+
+      children: [
+        const Text(
+          'Grafik Profit',
+
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+
+        const SizedBox(height: 6),
+
+        const Text(
+          'Analisis pembelian, penjualan, pengeluaran dan profit',
+
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.grey,
+          ),
+        ),
+
+        const SizedBox(height: 24),
+
+        SizedBox(
+          height: 300,
+
+          child: LineChart(
+            LineChartData(
+              minX: 0,
+
+              maxX:
+                  penjualanSpots.length
+                      .toDouble() -
+                  1,
+
+              minY: 0,
+
+              gridData: FlGridData(
+                show: true,
+                drawVerticalLine: false,
+              ),
+
+              borderData:
+                  FlBorderData(show: false),
+
+              titlesData: FlTitlesData(
+                topTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: false,
+                  ),
+                ),
+
+                rightTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: false,
+                  ),
+                ),
+
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+
+                    getTitlesWidget:
+                        (value, meta) {
+                      return Padding(
+                        padding:
+                            const EdgeInsets.only(
+                              top: 8,
+                            ),
+
+                        child: Text(
+                          '${value.toInt() + 1}',
+
+                          style:
+                              const TextStyle(
+                                fontSize: 11,
+                              ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+
+                leftTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+
+                    reservedSize: 40,
+
+                    getTitlesWidget:
+                        (value, meta) {
+                      return Text(
+                        '${value.toInt()} jt',
+
+                        style:
+                            const TextStyle(
+                              fontSize: 10,
+                            ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+
+              lineBarsData: [
+                // PENJUALAN
+
+                LineChartBarData(
+                  spots: penjualanSpots,
+                  isCurved: false,
+                  color: Colors.green,
+                  barWidth: 4,
+
+                  dotData: FlDotData(
+                    show: true,
+                  ),
+                ),
+
+                // PEMBELIAN
+
+                LineChartBarData(
+                  spots: pembelianSpots,
+                  isCurved: false,
+                  color: Colors.red,
+                  barWidth: 4,
+
+                  dotData: FlDotData(
+                    show: true,
+                  ),
+                ),
+
+                // PENGELUARAN
+
+                LineChartBarData(
+                  spots: pengeluaranSpots,
+                  isCurved: false,
+                  color: Colors.orange,
+                  barWidth: 4,
+
+                  dotData: FlDotData(
+                    show: true,
+                  ),
+                ),
+
+                // PROFIT
+
+                LineChartBarData(
+                  spots: profitSpots,
+                  isCurved: false,
+                  color: Colors.blue,
+                  barWidth: 4,
+
+                  dotData: FlDotData(
+                    show: true,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 20),
+
+        Wrap(
+          spacing: 16,
+          runSpacing: 10,
+
+          children: [
+            buildLegend(
+              Colors.green,
+              'Penjualan',
+            ),
+
+            buildLegend(
+              Colors.red,
+              'Pembelian',
+            ),
+
+            buildLegend(
+              Colors.orange,
+              'Pengeluaran',
+            ),
+
+            buildLegend(
+              Colors.blue,
+              'Profit',
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
+}
 
   // ================= TABLE =================
 
