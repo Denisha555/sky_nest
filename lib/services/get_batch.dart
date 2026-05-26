@@ -24,6 +24,7 @@ Future<List<Map<String, dynamic>>> getBatchDetails(String batchId) async {
       .from('batches_details')
       .select()
       .eq('batch_id', batchId);
+  print("Batch Details Response: $response");
 
   if (response.isEmpty) {
     print('Batch not found');

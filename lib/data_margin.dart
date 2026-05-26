@@ -30,7 +30,7 @@ class _DataMarginState extends State<DataMargin> {
 
   int get hargaJual => int.tryParse(hargaJualCtrl.text) ?? 0;
 
-  int get profit => hargaJual - totalBiaya;
+  int get profit => hargaJual - totalBiaya - hargaBeli;
 
   // FIX 2: Hindari division by zero
   double get marginPersen => totalBiaya == 0 ? 0 : (profit / totalBiaya) * 100;
@@ -126,20 +126,19 @@ class _DataMarginState extends State<DataMargin> {
                     List<Map<String, dynamic>> temp = await getBatchDetails(
                       value!,
                     );
+                    int totalHarga = 0;
                     if (temp.isNotEmpty) {
-                      int totalHarga = 0;
                       for (var detail in temp) {
                         if (detail['batch_id'] == value) {
-                          totalHarga += int.tryParse(detail['harga'].toString()) ?? 0;
+                          totalHarga +=
+                              int.tryParse(detail['harga'].toString()) ?? 0;
                         }
                       }
-                      
-                      setState(() {
-                        hargaBeli = totalHarga;
-                      });
+                      print("Total Harga Beli: $totalHarga");
                     }
                     setState(() {
                       selectedBatch = value;
+                      hargaBeli = totalHarga;
                     });
                   },
                 ),
@@ -392,7 +391,7 @@ class _DataMarginState extends State<DataMargin> {
                   child: ElevatedButton.icon(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        // aksi simpan
+                        
                       }
                     },
                     label: const Text('Simpan'),
