@@ -238,6 +238,7 @@ class _HalamanProfilState extends State<HalamanProfil> {
 
 Container(
 
+width: double.infinity,
   padding: const EdgeInsets.all(20),
 
   decoration: BoxDecoration(
@@ -333,7 +334,7 @@ Container(
 ),
 
               // ================= FORM =================
-
+              const SizedBox(height: 5),
               Container(
 
                 padding: const EdgeInsets.all(20),
