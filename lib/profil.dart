@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter_application_1/services/get_user.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
@@ -43,8 +44,7 @@ class _HalamanProfilState extends State<HalamanProfil> {
   SharedPreferences prefs =
       await SharedPreferences.getInstance();
 
-  usernameController.text =
-      prefs.getString('username') ?? '';
+  usernameController.text = await getUsername(prefs.getString('id')!);
 
   String? fotoPath =
       prefs.getString('foto_profil');
@@ -85,42 +85,27 @@ Future<void> simpanData() async {
     SharedPreferences prefs =
         await SharedPreferences.getInstance();
 
-    String usernameLama =
-        prefs.getString('username') ?? '';
+    final userId = prefs.getString('id');
 
-    print("Username lama: $usernameLama");
-    print(
-      "Username baru: ${usernameController.text}",
-    );
-
-    Map<String, dynamic> dataUpdate = {
-      'username': usernameController.text,
-    };
+    String passwordHash = "";
 
     if (passwordController.text.trim().isNotEmpty) {
-      String passwordHash = sha256
+      passwordHash = sha256
           .convert(
             utf8.encode(
               passwordController.text,
             ),
           )
           .toString();
-
-      dataUpdate['password'] = passwordHash;
     }
 
     final result = await Supabase.instance.client
         .from('user')
-        .update(dataUpdate)
-        .eq('username', usernameLama)
+        .update({"username": usernameController.text, "password": passwordHash})
+        .eq('id', userId!)
         .select();
 
     print("HASIL UPDATE: $result");
-
-    await prefs.setString(
-      'username',
-      usernameController.text,
-    );
 
     setState(() {
       isEdit = false;
@@ -256,9 +241,7 @@ Future<void> simpanData() async {
                 SharedPreferences prefs =
                     await SharedPreferences.getInstance();
 
-                await prefs.remove('username');
-                await prefs.remove('password');
-                await prefs.remove('isLogin');
+                await prefs.clear();
 
                 if (!mounted) return;
 
@@ -274,7 +257,6 @@ Future<void> simpanData() async {
 
               child: const Text(
                 "Keluar",
-
                 style: TextStyle(
                   color: Colors.red,
                 ),
@@ -672,6 +654,7 @@ width: double.infinity,
                   ),
                 ),
               ),
+              SizedBox(height: 20,)
             ],
           ),
         ),

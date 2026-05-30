@@ -13,6 +13,9 @@ class Dashboard extends StatefulWidget {
 class _DashboardState extends State<Dashboard> {
 
   List<Map<String, dynamic>> batches = [];
+  int totalModal = 0;
+  int totalPenjualan = 0;
+  int totalProfit = 0;
 
   @override
   void initState() {
@@ -23,10 +26,25 @@ class _DashboardState extends State<Dashboard> {
   Future<void> getBatch() async {
 
     List<Map<String, dynamic>> data =
-        await getAllBatch();
+        await getAllBatchThisMonth();
+
+    int tempHargaJual = 0;
+    int tempProfit = 0;
+
+    int tempModal = await getTotalModalThisMonth();
+
+    for (var d in data) {
+      if (d['harga_jual'] != null) {
+        tempHargaJual += int.parse(d['harga_jual'].toString());
+        tempProfit += int.parse(d['profit'].toString());
+      }
+    }
 
     setState(() {
       batches = data;
+      totalPenjualan = tempHargaJual;
+      totalProfit = tempProfit;
+      totalModal = tempModal;
     });
   }
 
@@ -42,7 +60,7 @@ class _DashboardState extends State<Dashboard> {
 
       floatingActionButton: Padding(
 
-        padding: const EdgeInsets.only(
+        padding: EdgeInsets.only(
           bottom: 5,
         ),
 
@@ -93,7 +111,7 @@ class _DashboardState extends State<Dashboard> {
         child: SingleChildScrollView(
 
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(16.0),
 
             child: Center(
 
@@ -132,7 +150,7 @@ class _DashboardState extends State<Dashboard> {
                     ),
                   ),
 
-                  const Card(
+                  Card(
                     color: Colors.green,
 
                     child: ListTile(
@@ -148,7 +166,7 @@ class _DashboardState extends State<Dashboard> {
                       ),
 
                       trailing: Text(
-                        '50.000.000',
+                        totalModal.toString(),
 
                         style: TextStyle(
                           fontSize: 20,
@@ -159,7 +177,7 @@ class _DashboardState extends State<Dashboard> {
                     ),
                   ),
 
-                  const Card(
+                  Card(
                     color: Colors.orange,
 
                     child: ListTile(
@@ -175,8 +193,7 @@ class _DashboardState extends State<Dashboard> {
                       ),
 
                       trailing: Text(
-                        '100.000.000',
-
+                        totalPenjualan.toString(),
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -186,41 +203,15 @@ class _DashboardState extends State<Dashboard> {
                     ),
                   ),
 
-                  const Card(
-                    color: Colors.red,
-
-                    child: ListTile(
-
-                      title: Text(
-                        'Total Profit',
-
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-
-                      trailing: Text(
-                        '50.000.000',
-
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-
+                  
                   const SizedBox(height: 20),
 
-                  const Card(
+                  Card(
 
                     child: ListTile(
 
                       title: Text(
-                        'Shrinkage Rata-rata: ',
+                        'Total Profit: ',
 
                         style: TextStyle(
                           fontSize: 20,
@@ -230,7 +221,7 @@ class _DashboardState extends State<Dashboard> {
                       ),
 
                       trailing: Text(
-                        '10%',
+                        totalProfit.toString(),
 
                         style: TextStyle(
                           fontSize: 20,

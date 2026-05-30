@@ -207,7 +207,7 @@ class _DataBatchState extends State<DataBatch> {
                 controller: _searchCtrl,
                 style: const TextStyle(fontSize: 14),
                 decoration: InputDecoration(
-                  hintText: 'Cari supplier atau nama batch...',
+                  hintText: 'Cari supplier atau jenis bahan...',
                   hintStyle: TextStyle(
                     color: Colors.grey.shade500,
                     fontSize: 14,
@@ -425,7 +425,7 @@ class _BatchCard extends StatelessWidget {
 
 // ─── Detail Page ─────────────────────────────────────────────────────────────
 
-class BatchDetails extends StatelessWidget {
+class BatchDetails extends StatefulWidget {
   const BatchDetails({
     super.key,
     required this.batch,
@@ -435,14 +435,41 @@ class BatchDetails extends StatelessWidget {
   final Map<String, dynamic> batch;
   final List<Map<String, dynamic>> batchDetails;
 
-  double get _totalBerat => batchDetails.fold(
+  @override
+  State<BatchDetails> createState() => _BatchDetailsState();
+}
+
+class _BatchDetailsState extends State<BatchDetails> {
+  double get _totalBerat => widget.batchDetails.fold(
     0,
     (sum, d) => sum + ((d['berat'] as num?)?.toDouble() ?? 0),
   );
 
+  int hargaBeli = 0;
+  int hargaJual = 0;
+  int profit = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    final tempHargaBeli = await getHargaBeli(widget.batch['id'] as String);
+    final tempHargaJual = await getHargaJual(widget.batch['id'] as String, "harga_jual");
+    final tempProfit = await getProfit(widget.batch['id'] as String, "profit");
+
+    setState(() {
+      hargaBeli = tempHargaBeli;
+      hargaJual = tempHargaJual;
+      profit = tempProfit;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final supplier = batch['supplier'] as String;
+    final supplier = widget.batch['supplier'] as String;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
@@ -500,7 +527,7 @@ class BatchDetails extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        batch['name'] as String,
+                        widget.batch['name'] as String,
                         style: TextStyle(
                           fontSize: 13,
                           color: Colors.grey.shade500,
@@ -521,7 +548,7 @@ class BatchDetails extends StatelessWidget {
                 child: _InfoTile(
                   icon: Icons.category_sharp,
                   label: 'Jenis',
-                  value: '${batch['name']}',
+                  value: '${widget.batch['name']}',
                 ),
               ),
               const SizedBox(width: 10),
@@ -529,7 +556,7 @@ class BatchDetails extends StatelessWidget {
                 child: _InfoTile(
                   icon: Icons.calendar_today_outlined,
                   label: 'Tanggal',
-                  value: batch['date'] as String,
+                  value: widget.batch['date'] as String,
                 ),
               ),
             ],
@@ -543,7 +570,7 @@ class BatchDetails extends StatelessWidget {
                 child: _InfoTile(
                   icon: Icons.science_outlined,
                   label: 'Komposisi',
-                  value: '${batchDetails.length} item',
+                  value: '${widget.batchDetails.length} item',
                 ),
               ),
               const SizedBox(width: 10),
@@ -566,7 +593,7 @@ class BatchDetails extends StatelessWidget {
               border: Border.all(color: Colors.grey.shade200, width: 0.5),
             ),
             child: Column(
-              children: [Text("Harga Beli", style: TextStyle(fontSize: 10, color: Colors.grey.shade400),), Text("Rp", style: const TextStyle(
+              children: [Text("Harga Beli", style: TextStyle(fontSize: 10, color: Colors.grey.shade400),), Text("Rp $hargaBeli", style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                 ),)]),
@@ -582,7 +609,7 @@ class BatchDetails extends StatelessWidget {
               border: Border.all(color: Colors.grey.shade200, width: 0.5),
             ),
             child: Column(
-              children: [Text("Harga Jual", style: TextStyle(fontSize: 10, color: Colors.grey.shade400),), Text("Rp", style: const TextStyle(
+              children: [Text("Harga Jual", style: TextStyle(fontSize: 10, color: Colors.grey.shade400),), Text("Rp $hargaJual", style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                 ),)]),
@@ -596,7 +623,7 @@ class BatchDetails extends StatelessWidget {
               border: Border.all(color: Colors.grey.shade200, width: 0.5),
             ),
             child: Column(
-              children: [Text("Profit", style: TextStyle(fontSize: 10, color: Colors.grey.shade400),), Text("Rp", style: const TextStyle(
+              children: [Text("Profit", style: TextStyle(fontSize: 10, color: Colors.grey.shade400),), Text("Rp $profit", style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                 ),)]),
@@ -611,7 +638,7 @@ class BatchDetails extends StatelessWidget {
           ),
           const SizedBox(height: 8),
 
-          if (batchDetails.isEmpty)
+          if (widget.batchDetails.isEmpty)
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
@@ -627,7 +654,7 @@ class BatchDetails extends StatelessWidget {
               ),
             )
           else
-            ...batchDetails.asMap().entries.map((entry) {
+            ...widget.batchDetails.asMap().entries.map((entry) {
               final i = entry.key;
               final d = entry.value;
               final berat = (d['berat'] as num?)?.toDouble() ?? 0;
@@ -714,7 +741,7 @@ class BatchDetails extends StatelessWidget {
           ),
           const SizedBox(height: 8),
 
-          if (batchDetails[0]["metode_cuci"] == null)
+          if (widget.batchDetails[0]["metode_cuci"] == null)
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
@@ -730,7 +757,7 @@ class BatchDetails extends StatelessWidget {
               ),
             )
           else
-            ...batchDetails.asMap().entries.map((entry) {
+            ...widget.batchDetails.asMap().entries.map((entry) {
               final i = entry.key;
               final d = entry.value;
               final berat = (d['berat_akhir'] as num?)?.toDouble() ?? 0;
