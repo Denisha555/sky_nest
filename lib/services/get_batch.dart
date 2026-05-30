@@ -18,6 +18,30 @@ Future<List<Map<String, dynamic>>> getAllBatch() async {
   }
 }
 
+Future<List<Map<String, dynamic>>> getAvailableBatcForProcess() async {
+  try {
+  final response = await Supabase.instance.client
+      .from('batches')
+      .select('''
+          *,
+          batches_details!inner(
+          *
+          )
+      '''
+      ).filter("batches_details.metode_cuci", "is", null);
+
+  if (response.isEmpty) {
+    print('No batches found');
+    return [];
+  } else {
+    return List<Map<String, dynamic>>.from(response);
+  }
+  } catch (e) {
+    print('Error fetching batches: $e');
+    return [];
+  }
+}
+
 Future<List<Map<String, dynamic>>> getBatchDetails(String batchId) async {
   try {
   final response = await Supabase.instance.client
@@ -36,6 +60,24 @@ Future<List<Map<String, dynamic>>> getBatchDetails(String batchId) async {
     print('Error fetching batch details: $e');
     return [];
   }
-
-  
 }
+
+Future<List<Map<String, dynamic>>> getAvailableBatchForMargin() async {
+  try {
+    final response = await Supabase.instance.client
+      .from('batches')
+      .select()
+      .filter('harga_jual', 'is', null);
+
+    if (response.isEmpty) {
+      print('No batches found');
+      return [];
+    } else {
+      return List<Map<String, dynamic>>.from(response);
+    }
+  } catch (e) {
+    print('Error fetching batches: $e');
+    return [];
+  }
+}
+   

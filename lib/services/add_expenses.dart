@@ -6,7 +6,7 @@ Future<void> addExpense(String nama, int nominal, String batchId) async {
         .from('expenses')
         .insert({
       'id': '${batchId}_$nama',
-      'nama': nama,
+      'name': nama,
       'nominal': nominal,
       'batch_id': batchId,
     });

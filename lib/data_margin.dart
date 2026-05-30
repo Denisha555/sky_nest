@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/services/add_expenses.dart';
+import 'package:flutter_application_1/services/edit_batch.dart';
 import 'package:flutter_application_1/services/get_batch.dart';
 
 class DataMargin extends StatefulWidget {
@@ -52,7 +54,7 @@ class _DataMarginState extends State<DataMargin> {
   }
 
   Future<void> _getBatchData() async {
-    final temp = await getAllBatch();
+    final temp = await getAvailableBatchForMargin();
     setState(() {
       batch = temp;
     });
@@ -137,7 +139,7 @@ class _DataMarginState extends State<DataMargin> {
                       print("Total Harga Beli: $totalHarga");
                     }
                     setState(() {
-                      selectedBatch = value;
+                    selectedBatch = value;
                       hargaBeli = totalHarga;
                     });
                   },
@@ -389,9 +391,13 @@ class _DataMarginState extends State<DataMargin> {
                   width: double.infinity,
                   height: 50,
                   child: ElevatedButton.icon(
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        
+                        await editBatch(field: "harga_jual", value: hargaJual, batchId: selectedBatch!);
+                        await editBatch(field: "profit", value: profit, batchId: selectedBatch!);
+                        await addExpense("ongkos cuci", int.parse(ongkosCuciCtrl.text), selectedBatch!);
+                        await addExpense("ongkos kirim", int.parse(ongkosKirimCtrl.text), selectedBatch!);
+                        await addExpense("biaya lain", int.parse(biayaLainCtrl.text), selectedBatch!);
                       }
                     },
                     label: const Text('Simpan'),
