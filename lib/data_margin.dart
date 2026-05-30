@@ -33,7 +33,7 @@ class _DataMarginState extends State<DataMargin> {
   int get profit => hargaJual - totalBiaya - hargaBeli;
 
   // FIX 2: Hindari division by zero
-  double get marginPersen => totalBiaya == 0 ? 0 : (profit / totalBiaya) * 100;
+  double get marginPersen => hargaJual == 0 ? 0 : (profit / hargaJual) * 100;
 
   @override
   void initState() {
