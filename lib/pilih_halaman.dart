@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/dashboard.dart';
-import 'package:flutter_application_1/profile.dart';
 import 'package:flutter_application_1/tambah_batch.dart';
 import 'package:flutter_application_1/data_batch.dart';
 import 'package:flutter_application_1/data_process.dart';

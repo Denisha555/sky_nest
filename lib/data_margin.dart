@@ -30,10 +30,10 @@ class _DataMarginState extends State<DataMargin> {
 
   int get hargaJual => int.tryParse(hargaJualCtrl.text) ?? 0;
 
-  int get profit => hargaJual - totalBiaya;
+  int get profit => hargaJual - totalBiaya - hargaBeli;
 
   // FIX 2: Hindari division by zero
-  double get marginPersen => totalBiaya == 0 ? 0 : (profit / totalBiaya) * 100;
+  double get marginPersen => hargaJual == 0 ? 0 : (profit / hargaJual) * 100;
 
   @override
   void initState() {
@@ -109,8 +109,7 @@ class _DataMarginState extends State<DataMargin> {
                       batch
                           .map(
                             (b) => DropdownMenuItem(
-                              value:
-                                  "${b["id"]}",
+                              value: "${b["id"]}",
                               child: Text(
                                 "${b['supplier']} - ${b['name']} - ${b['date']}",
                                 style: const TextStyle(fontSize: 14),
@@ -124,9 +123,22 @@ class _DataMarginState extends State<DataMargin> {
                               ? 'Pilih batch terlebih dahulu'
                               : null,
                   onChanged: (value) async {
-                    List<Map<String, dynamic>> temp = await getBatchDetails(value!);
+                    List<Map<String, dynamic>> temp = await getBatchDetails(
+                      value!,
+                    );
+                    int totalHarga = 0;
+                    if (temp.isNotEmpty) {
+                      for (var detail in temp) {
+                        if (detail['batch_id'] == value) {
+                          totalHarga +=
+                              int.tryParse(detail['harga'].toString()) ?? 0;
+                        }
+                      }
+                      print("Total Harga Beli: $totalHarga");
+                    }
                     setState(() {
                       selectedBatch = value;
+                      hargaBeli = totalHarga;
                     });
                   },
                 ),
@@ -252,9 +264,7 @@ class _DataMarginState extends State<DataMargin> {
 
                             const SizedBox(height: 15),
 
-
-
-                            const SizedBox(height: 15,),
+                            const SizedBox(height: 15),
                             Container(
                               width: double.infinity,
                               padding: const EdgeInsets.symmetric(
@@ -276,6 +286,31 @@ class _DataMarginState extends State<DataMargin> {
                             ),
                             const SizedBox(height: 10),
                             Text("Harga Jual : Rp $hargaJual"),
+
+                            SizedBox(height: 15),
+
+                            const SizedBox(height: 15),
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(4),
+                                color: Colors.blue.shade700,
+                              ),
+                              child: const Text(
+                                "Harga Beli",
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text("Harga Beli : Rp $hargaBeli"),
                           ],
                         ),
                       ),
@@ -356,7 +391,7 @@ class _DataMarginState extends State<DataMargin> {
                   child: ElevatedButton.icon(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        // aksi simpan
+                        
                       }
                     },
                     label: const Text('Simpan'),
