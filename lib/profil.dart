@@ -80,8 +80,7 @@ class _HalamanProfilState extends State<HalamanProfil> {
 }
 
   // ================= SIMPAN =================
-
-  Future<void> simpanData() async {
+Future<void> simpanData() async {
   try {
     SharedPreferences prefs =
         await SharedPreferences.getInstance();
@@ -89,28 +88,34 @@ class _HalamanProfilState extends State<HalamanProfil> {
     String usernameLama =
         prefs.getString('username') ?? '';
 
+    print("Username lama: $usernameLama");
+    print(
+      "Username baru: ${usernameController.text}",
+    );
+
     Map<String, dynamic> dataUpdate = {
       'username': usernameController.text,
     };
 
     if (passwordController.text.trim().isNotEmpty) {
-      String passwordHash =
-          sha256
-              .convert(
-                utf8.encode(
-                  passwordController.text,
-                ),
-              )
-              .toString();
+      String passwordHash = sha256
+          .convert(
+            utf8.encode(
+              passwordController.text,
+            ),
+          )
+          .toString();
 
-      dataUpdate['password'] =
-          passwordHash;
+      dataUpdate['password'] = passwordHash;
     }
 
-    await Supabase.instance.client
+    final result = await Supabase.instance.client
         .from('user')
         .update(dataUpdate)
-        .eq('username', usernameLama);
+        .eq('username', usernameLama)
+        .select();
+
+    print("HASIL UPDATE: $result");
 
     await prefs.setString(
       'username',
@@ -132,6 +137,8 @@ class _HalamanProfilState extends State<HalamanProfil> {
       ),
     );
   } catch (e) {
+    print("ERROR: $e");
+
     if (!mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -144,6 +151,73 @@ class _HalamanProfilState extends State<HalamanProfil> {
     );
   }
 }
+
+
+
+
+//   Future<void> simpanData() async {
+//   try {
+//     SharedPreferences prefs =
+//         await SharedPreferences.getInstance();
+
+//     String usernameLama =
+//         prefs.getString('username') ?? '';
+
+//     Map<String, dynamic> dataUpdate = {
+//       'username': usernameController.text,
+//     };
+
+//     if (passwordController.text.trim().isNotEmpty) {
+//       String passwordHash =
+//           sha256
+//               .convert(
+//                 utf8.encode(
+//                   passwordController.text,
+//                 ),
+//               )
+//               .toString();
+
+//       dataUpdate['password'] =
+//           passwordHash;
+//     }
+
+//     await Supabase.instance.client
+//         .from('user')
+//         .update(dataUpdate)
+//         .eq('username', usernameLama);
+
+//     await prefs.setString(
+//       'username',
+//       usernameController.text,
+//     );
+
+//     setState(() {
+//       isEdit = false;
+//     });
+
+//     if (!mounted) return;
+
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       const SnackBar(
+//         content: Text(
+//           'Username dan Password berhasil disimpan',
+//         ),
+//         backgroundColor: Colors.green,
+//       ),
+//     );
+//   } catch (e) {
+//     if (!mounted) return;
+
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       SnackBar(
+//         content: Text(
+//           'Gagal menyimpan data: $e',
+//         ),
+//         backgroundColor: Colors.red,
+//       ),
+//     );
+//   }
+// }
 
   // ================= LOGOUT =================
 
