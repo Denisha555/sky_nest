@@ -8,8 +8,6 @@ Future<bool> editBatchWithDetails({
   required String beratAkhir,
 }) async {
   try {
-    print("Editing batch with ID: $batchId, Komposisi: $komposisi");
-    print("New beratAkhir: $beratAkhir");
     await Supabase.instance.client
         .from('batches_details')
         .update({'berat_akhir': beratAkhir, 'metode_cuci': metodeCuci})
@@ -20,3 +18,22 @@ Future<bool> editBatchWithDetails({
     return false; // gagal
   }
 }
+
+Future<bool> editBatch({
+  required String field,
+  required dynamic value,
+  required String batchId,
+}) async {
+  try {
+    await Supabase.instance.client
+        .from('batches')
+        .update({field: value})
+        .eq('id', batchId);
+    return true; // sukses semua
+  } catch (error) {
+    print('Error: $error');
+    return false; // gagal
+  }
+}
+
+

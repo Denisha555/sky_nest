@@ -74,11 +74,14 @@ class _DataBatchState extends State<DataBatch> {
   void _onSearch() {
     final q = _searchCtrl.text.toLowerCase();
     setState(() {
-      _filtered = _batches
-          .where((b) =>
-              b['supplier'].toString().toLowerCase().contains(q) ||
-              b['name'].toString().toLowerCase().contains(q))
-          .toList();
+      _filtered =
+          _batches
+              .where(
+                (b) =>
+                    b['supplier'].toString().toLowerCase().contains(q) ||
+                    b['name'].toString().toLowerCase().contains(q),
+              )
+              .toList();
     });
   }
 
@@ -97,14 +100,21 @@ class _DataBatchState extends State<DataBatch> {
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
       child: Row(
         children: [
-          Expanded(child: _StatCard(label: 'Total Batch', value: '${_batches.length}', sub: 'tercatat')),
+          Expanded(
+            child: _StatCard(
+              label: 'Total Batch',
+              value: '${_batches.length}',
+              sub: 'tercatat',
+            ),
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: _StatCard(
               label: 'Total Berat',
-              value: totalBerat >= 1000
-                  ? '${(totalBerat / 1000).toStringAsFixed(1)}t'
-                  : '${totalBerat.toStringAsFixed(0)} kg',
+              value:
+                  totalBerat >= 1000
+                      ? '${(totalBerat / 1000).toStringAsFixed(1)}t'
+                      : '${totalBerat.toStringAsFixed(0)} kg',
               sub: 'semua komposisi',
             ),
           ),
@@ -140,16 +150,15 @@ class _DataBatchState extends State<DataBatch> {
           batch: batch,
           detailCount: count,
           onTap: () {
-            final details = _batchDetails
-                .where((d) => d['batch_id'] == batch['id'])
-                .toList();
+            final details =
+                _batchDetails
+                    .where((d) => d['batch_id'] == batch['id'])
+                    .toList();
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => BatchDetails(
-                  batch: batch,
-                  batchDetails: details,
-                ),
+                builder:
+                    (_) => BatchDetails(batch: batch, batchDetails: details),
               ),
             );
           },
@@ -164,87 +173,98 @@ class _DataBatchState extends State<DataBatch> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
-      // appBar: AppBar(
-      //   title: const Text(
-      //     'Data Batch',
-      //     style: TextStyle(fontWeight: FontWeight.w600, fontSize: 17),
-      //   ),
-      //   backgroundColor: const Color(0xFF1565C0),
-      //   foregroundColor: Colors.white,
-      //   centerTitle: true,
-      //   elevation: 0,
-      // ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const TambahBatch(),
+        backgroundColor: const Color(0xFFF5F6FA),
+        // appBar: AppBar(
+        //   title: const Text(
+        //     'Data Batch',
+        //     style: TextStyle(fontWeight: FontWeight.w600, fontSize: 17),
+        //   ),
+        //   backgroundColor: const Color(0xFF1565C0),
+        //   foregroundColor: Colors.white,
+        //   centerTitle: true,
+        //   elevation: 0,
+        // ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const TambahBatch()),
+            );
+          },
+          backgroundColor: Colors.blue,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
           ),
-          );
-        },
-        backgroundColor: Colors.blue,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
-      body: Column(
-        children: [
-          // ── Search bar ──────────────────────────────────────────────────
-          Container(
-            color: Colors.blue,
-            padding: const EdgeInsets.fromLTRB(14, 15, 14, 14),
-            child: TextField(
-              controller: _searchCtrl,
-              style: const TextStyle(fontSize: 14),
-              decoration: InputDecoration(
-                hintText: 'Cari supplier atau nama batch...',
-                hintStyle: TextStyle(color: Colors.grey.shade500, fontSize: 14),
-                prefixIcon: const Icon(Icons.search, size: 20),
-                filled: true,
-                fillColor: Colors.white,
-                contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide.none,
+          child: const Icon(Icons.add, color: Colors.white),
+        ),
+        body: Column(
+          children: [
+            // ── Search bar ──────────────────────────────────────────────────
+            Container(
+              color: Colors.blue,
+              padding: const EdgeInsets.fromLTRB(14, 15, 14, 14),
+              child: TextField(
+                controller: _searchCtrl,
+                style: const TextStyle(fontSize: 14),
+                decoration: InputDecoration(
+                  hintText: 'Cari supplier atau jenis bahan...',
+                  hintStyle: TextStyle(
+                    color: Colors.grey.shade500,
+                    fontSize: 14,
+                  ),
+                  prefixIcon: const Icon(Icons.search, size: 20),
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(
+                    vertical: 0,
+                    horizontal: 16,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
                 ),
               ),
             ),
-          ),
 
-          // ── Body ────────────────────────────────────────────────────────
-          Expanded(
-            child: _isLoading
-                ? const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CircularProgressIndicator(color: Color(0xFF1565C0)),
-                        SizedBox(height: 12),
-                        Text('Memuat data...', style: TextStyle(color: Colors.grey)),
-                      ],
-                    ),
-                  )
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildSummary(),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(18, 2, 0, 4),
-                        child: Text(
-                          '${_filtered.length} batch ditemukan',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey.shade500,
-                            letterSpacing: 0.4,
-                          ),
+            // ── Body ────────────────────────────────────────────────────────
+            Expanded(
+              child:
+                  _isLoading
+                      ? const Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircularProgressIndicator(color: Color(0xFF1565C0)),
+                            SizedBox(height: 12),
+                            Text(
+                              'Memuat data...',
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ],
                         ),
+                      )
+                      : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildSummary(),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(18, 2, 0, 4),
+                            child: Text(
+                              '${_filtered.length} batch ditemukan',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey.shade500,
+                                letterSpacing: 0.4,
+                              ),
+                            ),
+                          ),
+                          Expanded(child: _buildList()),
+                        ],
                       ),
-                      Expanded(child: _buildList()),
-                    ],
-                  ),
-          ),
-        ],
-      ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -253,7 +273,11 @@ class _DataBatchState extends State<DataBatch> {
 // ─── Stat Card ───────────────────────────────────────────────────────────────
 
 class _StatCard extends StatelessWidget {
-  const _StatCard({required this.label, required this.value, required this.sub});
+  const _StatCard({
+    required this.label,
+    required this.value,
+    required this.sub,
+  });
 
   final String label;
   final String value;
@@ -271,10 +295,19 @@ class _StatCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: TextStyle(fontSize: 11, color: Colors.grey.shade500)),
+          Text(
+            label,
+            style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
+          ),
           const SizedBox(height: 2),
-          Text(value, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
-          Text(sub, style: TextStyle(fontSize: 11, color: Colors.grey.shade400)),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+          ),
+          Text(
+            sub,
+            style: TextStyle(fontSize: 11, color: Colors.grey.shade400),
+          ),
         ],
       ),
     );
@@ -335,7 +368,10 @@ class _BatchCard extends StatelessWidget {
                 children: [
                   Text(
                     supplier,
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -359,7 +395,10 @@ class _BatchCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 if (detailCount > 0)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFE3F2FD),
                       borderRadius: BorderRadius.circular(20),
@@ -386,7 +425,7 @@ class _BatchCard extends StatelessWidget {
 
 // ─── Detail Page ─────────────────────────────────────────────────────────────
 
-class BatchDetails extends StatelessWidget {
+class BatchDetails extends StatefulWidget {
   const BatchDetails({
     super.key,
     required this.batch,
@@ -396,14 +435,41 @@ class BatchDetails extends StatelessWidget {
   final Map<String, dynamic> batch;
   final List<Map<String, dynamic>> batchDetails;
 
-  double get _totalBerat => batchDetails.fold(
-        0,
-        (sum, d) => sum + ((d['berat'] as num?)?.toDouble() ?? 0),
-      );
+  @override
+  State<BatchDetails> createState() => _BatchDetailsState();
+}
+
+class _BatchDetailsState extends State<BatchDetails> {
+  double get _totalBerat => widget.batchDetails.fold(
+    0,
+    (sum, d) => sum + ((d['berat'] as num?)?.toDouble() ?? 0),
+  );
+
+  int hargaBeli = 0;
+  int hargaJual = 0;
+  int profit = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    final tempHargaBeli = await getHargaBeli(widget.batch['id'] as String);
+    final tempHargaJual = await getHargaJual(widget.batch['id'] as String, "harga_jual");
+    final tempProfit = await getProfit(widget.batch['id'] as String, "profit");
+
+    setState(() {
+      hargaBeli = tempHargaBeli;
+      hargaJual = tempHargaJual;
+      profit = tempProfit;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final supplier = batch['supplier'] as String;
+    final supplier = widget.batch['supplier'] as String;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
@@ -452,11 +518,21 @@ class BatchDetails extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(supplier,
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                      Text(
+                        supplier,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                       const SizedBox(height: 2),
-                      Text(batch['name'] as String,
-                          style: TextStyle(fontSize: 13, color: Colors.grey.shade500)),
+                      Text(
+                        widget.batch['name'] as String,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey.shade500,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -472,7 +548,7 @@ class BatchDetails extends StatelessWidget {
                 child: _InfoTile(
                   icon: Icons.category_sharp,
                   label: 'Jenis',
-                  value: '${batch['name']}',
+                  value: '${widget.batch['name']}',
                 ),
               ),
               const SizedBox(width: 10),
@@ -480,7 +556,7 @@ class BatchDetails extends StatelessWidget {
                 child: _InfoTile(
                   icon: Icons.calendar_today_outlined,
                   label: 'Tanggal',
-                  value: batch['date'] as String,
+                  value: widget.batch['date'] as String,
                 ),
               ),
             ],
@@ -494,7 +570,7 @@ class BatchDetails extends StatelessWidget {
                 child: _InfoTile(
                   icon: Icons.science_outlined,
                   label: 'Komposisi',
-                  value: '${batchDetails.length} item',
+                  value: '${widget.batchDetails.length} item',
                 ),
               ),
               const SizedBox(width: 10),
@@ -507,6 +583,52 @@ class BatchDetails extends StatelessWidget {
               ),
             ],
           ),
+          const SizedBox(height: 10),
+
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey.shade200, width: 0.5),
+            ),
+            child: Column(
+              children: [Text("Harga Beli", style: TextStyle(fontSize: 10, color: Colors.grey.shade400),), Text("Rp $hargaBeli", style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),)]),
+          ),
+
+          const SizedBox(height: 10),
+
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey.shade200, width: 0.5),
+            ),
+            child: Column(
+              children: [Text("Harga Jual", style: TextStyle(fontSize: 10, color: Colors.grey.shade400),), Text("Rp $hargaJual", style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),)]),
+          ),
+          SizedBox(height: 10,),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey.shade200, width: 0.5),
+            ),
+            child: Column(
+              children: [Text("Profit", style: TextStyle(fontSize: 10, color: Colors.grey.shade400),), Text("Rp $profit", style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),)]),
+          ),
+
           const SizedBox(height: 16),
 
           // ── Komposisi list ────────────────────────────────────────────
@@ -516,7 +638,7 @@ class BatchDetails extends StatelessWidget {
           ),
           const SizedBox(height: 8),
 
-          if (batchDetails.isEmpty)
+          if (widget.batchDetails.isEmpty)
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
@@ -525,12 +647,14 @@ class BatchDetails extends StatelessWidget {
                 border: Border.all(color: Colors.grey.shade200, width: 0.5),
               ),
               child: const Center(
-                child: Text('Tidak ada detail komposisi',
-                    style: TextStyle(color: Colors.grey)),
+                child: Text(
+                  'Tidak ada detail komposisi',
+                  style: TextStyle(color: Colors.grey),
+                ),
               ),
             )
           else
-            ...batchDetails.asMap().entries.map((entry) {
+            ...widget.batchDetails.asMap().entries.map((entry) {
               final i = entry.key;
               final d = entry.value;
               final berat = (d['berat'] as num?)?.toDouble() ?? 0;
@@ -570,7 +694,9 @@ class BatchDetails extends StatelessWidget {
                           child: Text(
                             d['komposisi'] as String,
                             style: const TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.w600),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                         Text(
@@ -590,13 +716,121 @@ class BatchDetails extends StatelessWidget {
                         value: pct,
                         minHeight: 5,
                         backgroundColor: Colors.grey.shade100,
-                        valueColor: const AlwaysStoppedAnimation(Color(0xFF1565C0)),
+                        valueColor: const AlwaysStoppedAnimation(
+                          Color(0xFF1565C0),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       '${(pct * 100).toStringAsFixed(1)}% dari total berat',
-                      style: TextStyle(fontSize: 11, color: Colors.grey.shade400),
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey.shade400,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
+
+          const SizedBox(height: 16),
+          const Text(
+            'Detail Hasil Pencucian',
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 8),
+
+          if (widget.batchDetails[0]["metode_cuci"] == null)
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: Colors.grey.shade200, width: 0.5),
+              ),
+              child: const Center(
+                child: Text(
+                  'Belum ada detail hasil pencucian',
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
+            )
+          else
+            ...widget.batchDetails.asMap().entries.map((entry) {
+              final i = entry.key;
+              final d = entry.value;
+              final berat = (d['berat_akhir'] as num?)?.toDouble() ?? 0;
+              final pct = _totalBerat > 0 ? berat / _totalBerat : 0.0;
+              return Container(
+                margin: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey.shade200, width: 0.5),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 28,
+                          height: 28,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE3F2FD),
+                            borderRadius: BorderRadius.circular(7),
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            '${i + 1}',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF0D47A1),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            d['komposisi'] as String,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          '${berat.toStringAsFixed(1)} kg',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF1565C0),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: LinearProgressIndicator(
+                        value: pct,
+                        minHeight: 5,
+                        backgroundColor: Colors.grey.shade100,
+                        valueColor: const AlwaysStoppedAnimation(
+                          Color(0xFF1565C0),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${(pct * 100).toStringAsFixed(1)}% dari total berat',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey.shade400,
+                      ),
                     ),
                   ],
                 ),
@@ -611,7 +845,11 @@ class BatchDetails extends StatelessWidget {
 // ─── Info Tile ────────────────────────────────────────────────────────────────
 
 class _InfoTile extends StatelessWidget {
-  const _InfoTile({required this.icon, required this.label, required this.value});
+  const _InfoTile({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
 
   final IconData icon;
   final String label;
@@ -633,11 +871,17 @@ class _InfoTile extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label,
-                  style: TextStyle(fontSize: 10, color: Colors.grey.shade400)),
-              Text(value,
-                  style: const TextStyle(
-                      fontSize: 13, fontWeight: FontWeight.w600)),
+              Text(
+                label,
+                style: TextStyle(fontSize: 10, color: Colors.grey.shade400),
+              ),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ],
           ),
         ],

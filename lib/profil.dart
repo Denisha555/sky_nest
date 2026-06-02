@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter_application_1/services/get_user.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
@@ -43,7 +44,11 @@ class _HalamanProfilState extends State<HalamanProfil> {
   Future<void> getDataUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
+
     usernameController.text = prefs.getString('username') ?? '';
+
+  usernameController.text = await getUsername(prefs.getString('id')!);
+
 
     String? fotoPath = prefs.getString('foto_profil');
 
@@ -74,6 +79,7 @@ class _HalamanProfilState extends State<HalamanProfil> {
   Future<void> simpanData() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
+
 
       String usernameLama = prefs.getString('username') ?? '';
 
@@ -181,6 +187,57 @@ class _HalamanProfilState extends State<HalamanProfil> {
         ),
       );
     }
+
+    final userId = prefs.getString('id');
+
+    String passwordHash = "";
+
+    if (passwordController.text.trim().isNotEmpty) {
+      passwordHash = sha256
+          .convert(
+            utf8.encode(
+              passwordController.text,
+            ),
+          )
+          .toString();
+    }
+
+    final result = await Supabase.instance.client
+        .from('user')
+        .update({"username": usernameController.text, "password": passwordHash})
+        .eq('id', userId!)
+        .select();
+
+    print("HASIL UPDATE: $result");
+
+    setState(() {
+      isEdit = false;
+    });
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Username dan Password berhasil disimpan',
+        ),
+        backgroundColor: Colors.green,
+      ),
+    );
+  } catch (e) {
+    print("ERROR: $e");
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Gagal menyimpan data: $e',
+        ),
+        backgroundColor: Colors.red,
+      ),
+    );
+
   }
 
   //   Future<void> simpanData() async {
@@ -272,9 +329,7 @@ class _HalamanProfilState extends State<HalamanProfil> {
               onPressed: () async {
                 SharedPreferences prefs = await SharedPreferences.getInstance();
 
-                await prefs.remove('username');
-                await prefs.remove('password');
-                await prefs.remove('isLogin');
+                await prefs.clear();
 
                 if (!mounted) return;
 
@@ -285,7 +340,15 @@ class _HalamanProfilState extends State<HalamanProfil> {
                 );
               },
 
+
               child: const Text("Keluar", style: TextStyle(color: Colors.red)),
+
+              child: const Text(
+                "Keluar",
+                style: TextStyle(
+                  color: Colors.red,
+                ),
+              ),
             ),
           ],
         );
@@ -594,6 +657,7 @@ class _HalamanProfilState extends State<HalamanProfil> {
                   ),
                 ),
               ),
+              SizedBox(height: 20,)
             ],
           ),
         ),

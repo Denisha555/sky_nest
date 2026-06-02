@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/dashboard.dart';
 import 'package:flutter_application_1/pilih_halaman.dart';
 import 'package:flutter_application_1/services/check_user.dart';
+import 'package:flutter_application_1/services/get_user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Login extends StatefulWidget {
@@ -62,11 +63,13 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
         passwordController.text,
       );
 
+      final userId = await getUserId(usernameController.text);
+
       if (!mounted) return;
 
       if (success) {
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('username', usernameController.text);
+        await prefs.setString('id', userId);
 
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(

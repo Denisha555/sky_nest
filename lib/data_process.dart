@@ -88,7 +88,8 @@ class _DataProcessState extends State<DataProcess> {
   Future<void> _loadBatches() async {
     setState(() => _isLoading = true);
     try {
-      final data = await getAllBatch();
+      final data = await getAvailableBatcForProcess();
+      print("data: $data");
       setState(() => _dataBatch = data);
     } catch (e) {
       _showError('Gagal memuat data batch: $e');

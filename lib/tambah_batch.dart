@@ -279,7 +279,7 @@ class _TambahBatchState extends State<TambahBatch> {
       return {
         'komposisi': komposisi,
         'berat': item.berat,
-        'harga': item.subtotal,
+        'harga': item.subtotal.round(),
       };
     }).toList();
 
