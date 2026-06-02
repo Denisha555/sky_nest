@@ -188,55 +188,55 @@ class _HalamanProfilState extends State<HalamanProfil> {
       );
     }
 
-    final userId = prefs.getString('id');
+  //   final userId = prefs.getString('id');
 
-    String passwordHash = "";
+  //   String passwordHash = "";
 
-    if (passwordController.text.trim().isNotEmpty) {
-      passwordHash = sha256
-          .convert(
-            utf8.encode(
-              passwordController.text,
-            ),
-          )
-          .toString();
-    }
+  //   if (passwordController.text.trim().isNotEmpty) {
+  //     passwordHash = sha256
+  //         .convert(
+  //           utf8.encode(
+  //             passwordController.text,
+  //           ),
+  //         )
+  //         .toString();
+  //   }
 
-    final result = await Supabase.instance.client
-        .from('user')
-        .update({"username": usernameController.text, "password": passwordHash})
-        .eq('id', userId!)
-        .select();
+  //   final result = await Supabase.instance.client
+  //       .from('user')
+  //       .update({"username": usernameController.text, "password": passwordHash})
+  //       .eq('id', userId!)
+  //       .select();
 
-    print("HASIL UPDATE: $result");
+  //   print("HASIL UPDATE: $result");
 
-    setState(() {
-      isEdit = false;
-    });
+  //   setState(() {
+  //     isEdit = false;
+  //   });
 
-    if (!mounted) return;
+  //   if (!mounted) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Username dan Password berhasil disimpan',
-        ),
-        backgroundColor: Colors.green,
-      ),
-    );
-  } catch (e) {
-    print("ERROR: $e");
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     const SnackBar(
+  //       content: Text(
+  //         'Username dan Password berhasil disimpan',
+  //       ),
+  //       backgroundColor: Colors.green,
+  //     ),
+  //   );
+  // } catch (e) {
+  //   print("ERROR: $e");
 
-    if (!mounted) return;
+  //   if (!mounted) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Gagal menyimpan data: $e',
-        ),
-        backgroundColor: Colors.red,
-      ),
-    );
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(
+  //       content: Text(
+  //         'Gagal menyimpan data: $e',
+  //       ),
+  //       backgroundColor: Colors.red,
+  //     ),
+  //   );
 
   }
 
@@ -341,7 +341,7 @@ class _HalamanProfilState extends State<HalamanProfil> {
               },
 
 
-              child: const Text("Keluar", style: TextStyle(color: Colors.red)),
+             
 
               child: const Text(
                 "Keluar",
