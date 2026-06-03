@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/services/add_expenses.dart';
 import 'package:flutter_application_1/services/edit_batch.dart';
 import 'package:flutter_application_1/services/get_batch.dart';
+import 'package:flutter_application_1/services/get_margin.dart';
 
 class DataMargin extends StatefulWidget {
   const DataMargin({super.key});
@@ -10,9 +11,14 @@ class DataMargin extends StatefulWidget {
   State<DataMargin> createState() => _DataMarginState();
 }
 
-class _DataMarginState extends State<DataMargin> {
+//
+class _DataMarginState extends State<DataMargin>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   List<Map<String, dynamic>> batch = [];
+  List<Map<String, dynamic>> _marginData = [];
+  // int _selectedTab = 0;
+  late TabController _tabController;
 
   String? selectedBatch;
   int hargaBeli = 0;
@@ -40,7 +46,11 @@ class _DataMarginState extends State<DataMargin> {
   @override
   void initState() {
     super.initState();
+
+    _tabController = TabController(length: 2, vsync: this);
+
     _getBatchData();
+    _loadMarginData();
 
     // FIX 3: Tambahkan listener agar UI kalkulasi terupdate saat input berubah
     ongkosCuciCtrl.addListener(_onFieldChanged);
@@ -60,8 +70,22 @@ class _DataMarginState extends State<DataMargin> {
     });
   }
 
+  Future<void> _loadMarginData() async {
+    try {
+      final data = await getMarginData();
+
+      setState(() {
+        _marginData = data;
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
   void dispose() {
+    _tabController.dispose();
+
     ongkosCuciCtrl.dispose();
     ongkosKirimCtrl.dispose();
     biayaLainCtrl.dispose();
@@ -83,342 +107,825 @@ class _DataMarginState extends State<DataMargin> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
+      body: Column(
+        children: [
+          Container(
+            color: Colors.white,
+            child: TabBar(
+              controller: _tabController,
+              labelColor: Colors.blue,
+              unselectedLabelColor: Colors.grey,
+              indicatorColor: Colors.blue,
+              tabs: const [
+                Tab(text: "Input Data"),
+                Tab(text: "Data Tersimpan"),
+              ],
+            ),
+          ),
+
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [_buildInputTab(), _buildDataTersimpanTab()],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDataTersimpanTab() {
+    if (_marginData.isEmpty) {
+      return const Center(child: Text("Belum ada data margin"));
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: _marginData.length,
+      itemBuilder: (context, index) {
+        final item = _marginData[index];
+
+        return Card(
+          margin: const EdgeInsets.only(bottom: 12),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  "Data Batch",
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 6),
-                DropdownButtonFormField<String>(
-                  value: selectedBatch,
-                  hint: const Text('Pilih Batch'),
-                  decoration: const InputDecoration(
-                    isDense: true,
-                    border: OutlineInputBorder(),
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 12,
-                    ),
+                Text(
+                  "${item['supplier']} - ${item['name']}",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
                   ),
-                  items:
-                      batch
-                          .map(
-                            (b) => DropdownMenuItem(
-                              value: "${b["id"]}",
-                              child: Text(
-                                "${b['supplier']} - ${b['name']} - ${b['date']}",
-                                style: const TextStyle(fontSize: 14),
-                              ),
-                            ),
-                          )
-                          .toList(),
-                  validator:
-                      (value) =>
-                          value == null || value.isEmpty
-                              ? 'Pilih batch terlebih dahulu'
-                              : null,
-                  onChanged: (value) async {
-                    List<Map<String, dynamic>> temp = await getBatchDetails(
-                      value!,
-                    );
-                    int totalHarga = 0;
-                    if (temp.isNotEmpty) {
-                      for (var detail in temp) {
-                        if (detail['batch_id'] == value) {
-                          totalHarga +=
-                              int.tryParse(detail['harga'].toString()) ?? 0;
-                        }
-                      }
-                      print("Total Harga Beli: $totalHarga");
-                    }
-                    setState(() {
-                    selectedBatch = value;
-                      hargaBeli = totalHarga;
-                    });
-                  },
-                ),
-                const SizedBox(height: 20),
-
-                const Text(
-                  "Harga Jual (Rp)",
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 6),
-                TextFormField(
-                  controller: hargaJualCtrl,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    isDense: true,
-                    hintText: 'Masukkan Harga Jual',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: _validateAngka,
                 ),
 
-                SizedBox(height: 20),
+                const SizedBox(height: 8),
 
-                const Text(
-                  "Ongkos Cuci (Rp)",
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 6),
-                TextFormField(
-                  controller: ongkosCuciCtrl,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    isDense: true,
-                    hintText: 'Masukkan Ongkos Cuci',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: _validateAngka,
-                ),
-                const SizedBox(height: 20),
+                Text("Harga Jual : Rp ${item['harga_jual'] ?? 0}"),
 
-                const Text(
-                  "Ongkos Kirim (Rp)",
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 6),
-                TextFormField(
-                  controller: ongkosKirimCtrl,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    isDense: true,
-                    hintText: 'Masukkan Ongkos Kirim',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: _validateAngka,
-                ),
-                const SizedBox(height: 20),
+                Text("Profit : Rp ${item['profit'] ?? 0}"),
 
-                const Text(
-                  "Biaya Lain (Rp)",
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 6),
-                TextFormField(
-                  controller: biayaLainCtrl,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    isDense: true,
-                    hintText: 'Masukkan Biaya Lain',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: _validateAngka,
-                ),
-                const SizedBox(height: 28),
+                const SizedBox(height: 12),
 
-                if (selectedBatch != null)
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "Perhitungan Margin",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.start,
-                      ),
-                      const SizedBox(height: 10),
-                      Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.blue.shade200),
-                          borderRadius: BorderRadius.circular(8),
-                          color: Colors.blue.shade50,
-                        ),
-                        padding: const EdgeInsets.all(12),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(4),
-                                color: Colors.blue.shade700,
-                              ),
-                              child: const Text(
-                                "Total Biaya",
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            // FIX 5: Gunakan getter totalBiaya
-                            Text("Total Biaya : Rp $totalBiaya"),
-
-                            const SizedBox(height: 15),
-
-                            const SizedBox(height: 15),
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(4),
-                                color: Colors.blue.shade700,
-                              ),
-                              child: const Text(
-                                "Harga Jual",
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            Text("Harga Jual : Rp $hargaJual"),
-
-                            SizedBox(height: 15),
-
-                            const SizedBox(height: 15),
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(4),
-                                color: Colors.blue.shade700,
-                              ),
-                              child: const Text(
-                                "Harga Beli",
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            Text("Harga Beli : Rp $hargaBeli"),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 12,
-                        ),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(4),
-                          color: Colors.blue.shade700,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                const Text(
-                                  "Profit",
-                                  style: TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                                // FIX 6: Gunakan getter profit
-                                Text(
-                                  "Rp $profit",
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Container(
-                              width: 1,
-                              height: 36,
-                              color: Colors.white38,
-                            ),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                const Text(
-                                  "Margin",
-                                  style: TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                                // FIX 7: Gunakan getter marginPersen, format 2 desimal
-                                Text(
-                                  "${marginPersen.toStringAsFixed(2)}%",
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                    ],
-                  ),
-
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton.icon(
-                    onPressed: () async {
-                      if (_formKey.currentState!.validate()) {
-                        await editBatch(field: "harga_jual", value: hargaJual, batchId: selectedBatch!);
-                        await editBatch(field: "profit", value: profit, batchId: selectedBatch!);
-                        await addExpense("ongkos cuci", int.parse(ongkosCuciCtrl.text), selectedBatch!);
-                        await addExpense("ongkos kirim", int.parse(ongkosKirimCtrl.text), selectedBatch!);
-                        await addExpense("biaya lain", int.parse(biayaLainCtrl.text), selectedBatch!);
-                      }
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: OutlinedButton.icon(
+                    icon: const Icon(Icons.visibility),
+                    label: const Text("Detail"),
+                    onPressed: () {
+                      _showDetailDialog(item);
                     },
-                    label: const Text('Simpan'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      textStyle: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
                   ),
                 ),
               ],
             ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showDetailDialog(Map<String, dynamic> item) {
+    showDialog(
+      context: context,
+      builder:
+          (_) => AlertDialog(
+            title: const Text("Detail Margin"),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Supplier : ${item['supplier']}"),
+                Text("Batch : ${item['name']}"),
+                Text("Harga Jual : Rp ${item['harga_jual']}"),
+                Text("Profit : Rp ${item['profit']}"),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("Tutup"),
+              ),
+            ],
+          ),
+    );
+  }
+
+  Widget _buildInputTab() {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Data Batch",
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 6),
+              DropdownButtonFormField<String>(
+                value: selectedBatch,
+                hint: const Text('Pilih Batch'),
+                decoration: const InputDecoration(
+                  isDense: true,
+                  border: OutlineInputBorder(),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 12,
+                  ),
+                ),
+                items:
+                    batch
+                        .map(
+                          (b) => DropdownMenuItem(
+                            value: "${b["id"]}",
+                            child: Text(
+                              "${b['supplier']} - ${b['name']} - ${b['date']}",
+                              style: const TextStyle(fontSize: 14),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                validator:
+                    (value) =>
+                        value == null || value.isEmpty
+                            ? 'Pilih batch terlebih dahulu'
+                            : null,
+                onChanged: (value) async {
+                  List<Map<String, dynamic>> temp = await getBatchDetails(
+                    value!,
+                  );
+                  int totalHarga = 0;
+                  if (temp.isNotEmpty) {
+                    for (var detail in temp) {
+                      if (detail['batch_id'] == value) {
+                        totalHarga +=
+                            int.tryParse(detail['harga'].toString()) ?? 0;
+                      }
+                    }
+                    print("Total Harga Beli: $totalHarga");
+                  }
+                  setState(() {
+                    selectedBatch = value;
+                    hargaBeli = totalHarga;
+                  });
+                },
+              ),
+              const SizedBox(height: 20),
+
+              const Text(
+                "Harga Jual (Rp)",
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 6),
+              TextFormField(
+                controller: hargaJualCtrl,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  isDense: true,
+                  hintText: 'Masukkan Harga Jual',
+                  border: OutlineInputBorder(),
+                ),
+                validator: _validateAngka,
+              ),
+
+              SizedBox(height: 20),
+
+              const Text(
+                "Ongkos Cuci (Rp)",
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 6),
+              TextFormField(
+                controller: ongkosCuciCtrl,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  isDense: true,
+                  hintText: 'Masukkan Ongkos Cuci',
+                  border: OutlineInputBorder(),
+                ),
+                validator: _validateAngka,
+              ),
+              const SizedBox(height: 20),
+
+              const Text(
+                "Ongkos Kirim (Rp)",
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 6),
+              TextFormField(
+                controller: ongkosKirimCtrl,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  isDense: true,
+                  hintText: 'Masukkan Ongkos Kirim',
+                  border: OutlineInputBorder(),
+                ),
+                validator: _validateAngka,
+              ),
+              const SizedBox(height: 20),
+
+              const Text(
+                "Biaya Lain (Rp)",
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 6),
+              TextFormField(
+                controller: biayaLainCtrl,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  isDense: true,
+                  hintText: 'Masukkan Biaya Lain',
+                  border: OutlineInputBorder(),
+                ),
+                validator: _validateAngka,
+              ),
+              const SizedBox(height: 28),
+
+              if (selectedBatch != null)
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Perhitungan Margin",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.start,
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.blue.shade200),
+                        borderRadius: BorderRadius.circular(8),
+                        color: Colors.blue.shade50,
+                      ),
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(4),
+                              color: Colors.blue.shade700,
+                            ),
+                            child: const Text(
+                              "Total Biaya",
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          // FIX 5: Gunakan getter totalBiaya
+                          Text("Total Biaya : Rp $totalBiaya"),
+
+                          const SizedBox(height: 15),
+
+                          const SizedBox(height: 15),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(4),
+                              color: Colors.blue.shade700,
+                            ),
+                            child: const Text(
+                              "Harga Jual",
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Text("Harga Jual : Rp $hargaJual"),
+
+                          SizedBox(height: 15),
+
+                          const SizedBox(height: 15),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(4),
+                              color: Colors.blue.shade700,
+                            ),
+                            child: const Text(
+                              "Harga Beli",
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Text("Harga Beli : Rp $hargaBeli"),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(4),
+                        color: Colors.blue.shade700,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const Text(
+                                "Profit",
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 12,
+                                ),
+                              ),
+                              // FIX 6: Gunakan getter profit
+                              Text(
+                                "Rp $profit",
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Container(
+                            width: 1,
+                            height: 36,
+                            color: Colors.white38,
+                          ),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const Text(
+                                "Margin",
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 12,
+                                ),
+                              ),
+                              // FIX 7: Gunakan getter marginPersen, format 2 desimal
+                              Text(
+                                "${marginPersen.toStringAsFixed(2)}%",
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                ),
+
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton.icon(
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      await editBatch(
+                        field: "harga_jual",
+                        value: hargaJual,
+                        batchId: selectedBatch!,
+                      );
+                      await editBatch(
+                        field: "profit",
+                        value: profit,
+                        batchId: selectedBatch!,
+                      );
+                      await addExpense(
+                        "ongkos cuci",
+                        int.parse(ongkosCuciCtrl.text),
+                        selectedBatch!,
+                      );
+                      await addExpense(
+                        "ongkos kirim",
+                        int.parse(ongkosKirimCtrl.text),
+                        selectedBatch!,
+                      );
+                      await addExpense(
+                        "biaya lain",
+                        int.parse(biayaLainCtrl.text),
+                        selectedBatch!,
+                      );
+
+                      // Refresh data margin
+                      await _loadMarginData();
+                      _tabController.animateTo(1);
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Data berhasil disimpan')),
+                      );
+                    }
+                  },
+
+                  label: const Text('Simpan'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    textStyle: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 }
+
+
+
+  // @override
+  // Widget build(BuildContext context) {
+  //   return Scaffold(
+  //     body: SingleChildScrollView(
+  //       child: Padding(
+  //         padding: const EdgeInsets.all(16.0),
+  //         child: Form(
+  //           key: _formKey,
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [
+  //               const Text(
+  //                 "Data Batch",
+  //                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+  //               ),
+  //               const SizedBox(height: 6),
+  //               DropdownButtonFormField<String>(
+  //                 value: selectedBatch,
+  //                 hint: const Text('Pilih Batch'),
+  //                 decoration: const InputDecoration(
+  //                   isDense: true,
+  //                   border: OutlineInputBorder(),
+  //                   contentPadding: EdgeInsets.symmetric(
+  //                     horizontal: 12,
+  //                     vertical: 12,
+  //                   ),
+  //                 ),
+  //                 items:
+  //                     batch
+  //                         .map(
+  //                           (b) => DropdownMenuItem(
+  //                             value: "${b["id"]}",
+  //                             child: Text(
+  //                               "${b['supplier']} - ${b['name']} - ${b['date']}",
+  //                               style: const TextStyle(fontSize: 14),
+  //                             ),
+  //                           ),
+  //                         )
+  //                         .toList(),
+  //                 validator:
+  //                     (value) =>
+  //                         value == null || value.isEmpty
+  //                             ? 'Pilih batch terlebih dahulu'
+  //                             : null,
+  //                 onChanged: (value) async {
+  //                   List<Map<String, dynamic>> temp = await getBatchDetails(
+  //                     value!,
+  //                   );
+  //                   int totalHarga = 0;
+  //                   if (temp.isNotEmpty) {
+  //                     for (var detail in temp) {
+  //                       if (detail['batch_id'] == value) {
+  //                         totalHarga +=
+  //                             int.tryParse(detail['harga'].toString()) ?? 0;
+  //                       }
+  //                     }
+  //                     print("Total Harga Beli: $totalHarga");
+  //                   }
+  //                   setState(() {
+  //                   selectedBatch = value;
+  //                     hargaBeli = totalHarga;
+  //                   });
+  //                 },
+  //               ),
+  //               const SizedBox(height: 20),
+
+  //               const Text(
+  //                 "Harga Jual (Rp)",
+  //                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+  //               ),
+  //               const SizedBox(height: 6),
+  //               TextFormField(
+  //                 controller: hargaJualCtrl,
+  //                 keyboardType: TextInputType.number,
+  //                 decoration: const InputDecoration(
+  //                   isDense: true,
+  //                   hintText: 'Masukkan Harga Jual',
+  //                   border: OutlineInputBorder(),
+  //                 ),
+  //                 validator: _validateAngka,
+  //               ),
+
+  //               SizedBox(height: 20),
+
+  //               const Text(
+  //                 "Ongkos Cuci (Rp)",
+  //                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+  //               ),
+  //               const SizedBox(height: 6),
+  //               TextFormField(
+  //                 controller: ongkosCuciCtrl,
+  //                 keyboardType: TextInputType.number,
+  //                 decoration: const InputDecoration(
+  //                   isDense: true,
+  //                   hintText: 'Masukkan Ongkos Cuci',
+  //                   border: OutlineInputBorder(),
+  //                 ),
+  //                 validator: _validateAngka,
+  //               ),
+  //               const SizedBox(height: 20),
+
+  //               const Text(
+  //                 "Ongkos Kirim (Rp)",
+  //                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+  //               ),
+  //               const SizedBox(height: 6),
+  //               TextFormField(
+  //                 controller: ongkosKirimCtrl,
+  //                 keyboardType: TextInputType.number,
+  //                 decoration: const InputDecoration(
+  //                   isDense: true,
+  //                   hintText: 'Masukkan Ongkos Kirim',
+  //                   border: OutlineInputBorder(),
+  //                 ),
+  //                 validator: _validateAngka,
+  //               ),
+  //               const SizedBox(height: 20),
+
+  //               const Text(
+  //                 "Biaya Lain (Rp)",
+  //                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+  //               ),
+  //               const SizedBox(height: 6),
+  //               TextFormField(
+  //                 controller: biayaLainCtrl,
+  //                 keyboardType: TextInputType.number,
+  //                 decoration: const InputDecoration(
+  //                   isDense: true,
+  //                   hintText: 'Masukkan Biaya Lain',
+  //                   border: OutlineInputBorder(),
+  //                 ),
+  //                 validator: _validateAngka,
+  //               ),
+  //               const SizedBox(height: 28),
+
+  //               if (selectedBatch != null)
+  //                 Column(
+  //                   mainAxisAlignment: MainAxisAlignment.start,
+  //                   crossAxisAlignment: CrossAxisAlignment.start,
+  //                   children: [
+  //                     const Text(
+  //                       "Perhitungan Margin",
+  //                       style: TextStyle(
+  //                         fontSize: 14,
+  //                         fontWeight: FontWeight.bold,
+  //                       ),
+  //                       textAlign: TextAlign.start,
+  //                     ),
+  //                     const SizedBox(height: 10),
+  //                     Container(
+  //                       width: double.infinity,
+  //                       decoration: BoxDecoration(
+  //                         border: Border.all(color: Colors.blue.shade200),
+  //                         borderRadius: BorderRadius.circular(8),
+  //                         color: Colors.blue.shade50,
+  //                       ),
+  //                       padding: const EdgeInsets.all(12),
+  //                       child: Column(
+  //                         mainAxisAlignment: MainAxisAlignment.start,
+  //                         crossAxisAlignment: CrossAxisAlignment.start,
+  //                         children: [
+  //                           Container(
+  //                             width: double.infinity,
+  //                             padding: const EdgeInsets.symmetric(
+  //                               horizontal: 10,
+  //                               vertical: 4,
+  //                             ),
+  //                             decoration: BoxDecoration(
+  //                               borderRadius: BorderRadius.circular(4),
+  //                               color: Colors.blue.shade700,
+  //                             ),
+  //                             child: const Text(
+  //                               "Total Biaya",
+  //                               style: TextStyle(
+  //                                 fontSize: 13,
+  //                                 fontWeight: FontWeight.bold,
+  //                                 color: Colors.white,
+  //                               ),
+  //                             ),
+  //                           ),
+  //                           const SizedBox(height: 10),
+  //                           // FIX 5: Gunakan getter totalBiaya
+  //                           Text("Total Biaya : Rp $totalBiaya"),
+
+  //                           const SizedBox(height: 15),
+
+  //                           const SizedBox(height: 15),
+  //                           Container(
+  //                             width: double.infinity,
+  //                             padding: const EdgeInsets.symmetric(
+  //                               horizontal: 10,
+  //                               vertical: 4,
+  //                             ),
+  //                             decoration: BoxDecoration(
+  //                               borderRadius: BorderRadius.circular(4),
+  //                               color: Colors.blue.shade700,
+  //                             ),
+  //                             child: const Text(
+  //                               "Harga Jual",
+  //                               style: TextStyle(
+  //                                 fontSize: 13,
+  //                                 fontWeight: FontWeight.bold,
+  //                                 color: Colors.white,
+  //                               ),
+  //                             ),
+  //                           ),
+  //                           const SizedBox(height: 10),
+  //                           Text("Harga Jual : Rp $hargaJual"),
+
+  //                           SizedBox(height: 15),
+
+  //                           const SizedBox(height: 15),
+  //                           Container(
+  //                             width: double.infinity,
+  //                             padding: const EdgeInsets.symmetric(
+  //                               horizontal: 10,
+  //                               vertical: 4,
+  //                             ),
+  //                             decoration: BoxDecoration(
+  //                               borderRadius: BorderRadius.circular(4),
+  //                               color: Colors.blue.shade700,
+  //                             ),
+  //                             child: const Text(
+  //                               "Harga Beli",
+  //                               style: TextStyle(
+  //                                 fontSize: 13,
+  //                                 fontWeight: FontWeight.bold,
+  //                                 color: Colors.white,
+  //                               ),
+  //                             ),
+  //                           ),
+  //                           const SizedBox(height: 10),
+  //                           Text("Harga Beli : Rp $hargaBeli"),
+  //                         ],
+  //                       ),
+  //                     ),
+  //                     const SizedBox(height: 10),
+  //                     Container(
+  //                       width: double.infinity,
+  //                       padding: const EdgeInsets.symmetric(
+  //                         horizontal: 14,
+  //                         vertical: 12,
+  //                       ),
+  //                       decoration: BoxDecoration(
+  //                         borderRadius: BorderRadius.circular(4),
+  //                         color: Colors.blue.shade700,
+  //                       ),
+  //                       child: Row(
+  //                         mainAxisAlignment: MainAxisAlignment.spaceAround,
+  //                         crossAxisAlignment: CrossAxisAlignment.center,
+  //                         children: [
+  //                           Column(
+  //                             mainAxisAlignment: MainAxisAlignment.center,
+  //                             crossAxisAlignment: CrossAxisAlignment.center,
+  //                             children: [
+  //                               const Text(
+  //                                 "Profit",
+  //                                 style: TextStyle(
+  //                                   color: Colors.white70,
+  //                                   fontSize: 12,
+  //                                 ),
+  //                               ),
+  //                               // FIX 6: Gunakan getter profit
+  //                               Text(
+  //                                 "Rp $profit",
+  //                                 style: const TextStyle(
+  //                                   color: Colors.white,
+  //                                   fontSize: 14,
+  //                                   fontWeight: FontWeight.bold,
+  //                                 ),
+  //                               ),
+  //                             ],
+  //                           ),
+  //                           Container(
+  //                             width: 1,
+  //                             height: 36,
+  //                             color: Colors.white38,
+  //                           ),
+  //                           Column(
+  //                             mainAxisAlignment: MainAxisAlignment.center,
+  //                             crossAxisAlignment: CrossAxisAlignment.center,
+  //                             children: [
+  //                               const Text(
+  //                                 "Margin",
+  //                                 style: TextStyle(
+  //                                   color: Colors.white70,
+  //                                   fontSize: 12,
+  //                                 ),
+  //                               ),
+  //                               // FIX 7: Gunakan getter marginPersen, format 2 desimal
+  //                               Text(
+  //                                 "${marginPersen.toStringAsFixed(2)}%",
+  //                                 style: const TextStyle(
+  //                                   color: Colors.white,
+  //                                   fontSize: 14,
+  //                                   fontWeight: FontWeight.bold,
+  //                                 ),
+  //                               ),
+  //                             ],
+  //                           ),
+  //                         ],
+  //                       ),
+  //                     ),
+  //                     const SizedBox(height: 20),
+  //                   ],
+  //                 ),
+
+  //               SizedBox(
+  //                 width: double.infinity,
+  //                 height: 50,
+  //                 child: ElevatedButton.icon(
+  //                   onPressed: () async {
+  //                     if (_formKey.currentState!.validate()) {
+  //                       await editBatch(field: "harga_jual", value: hargaJual, batchId: selectedBatch!);
+  //                       await editBatch(field: "profit", value: profit, batchId: selectedBatch!);
+  //                       await addExpense("ongkos cuci", int.parse(ongkosCuciCtrl.text), selectedBatch!);
+  //                       await addExpense("ongkos kirim", int.parse(ongkosKirimCtrl.text), selectedBatch!);
+  //                       await addExpense("biaya lain", int.parse(biayaLainCtrl.text), selectedBatch!);
+
+  //                        // Refresh data margin
+  //                        await _loadMarginData();
+  //                     }
+  //                   },
+                
+  //                   label: const Text('Simpan'),
+  //                   style: ElevatedButton.styleFrom(
+  //                     backgroundColor: Colors.blue,
+  //                     foregroundColor: Colors.white,
+  //                     shape: RoundedRectangleBorder(
+  //                       borderRadius: BorderRadius.circular(12),
+  //                     ),
+  //                     textStyle: const TextStyle(
+  //                       fontSize: 15,
+  //                       fontWeight: FontWeight.w500,
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  
+
