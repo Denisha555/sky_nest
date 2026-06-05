@@ -3,6 +3,7 @@ import 'package:flutter_application_1/services/add_expenses.dart';
 import 'package:flutter_application_1/services/edit_batch.dart';
 import 'package:flutter_application_1/services/get_batch.dart';
 import 'package:flutter_application_1/services/get_margin.dart';
+import 'package:flutter_application_1/services/delete_margin.dart';
 
 class DataMargin extends StatefulWidget {
   const DataMargin({super.key});
@@ -168,15 +169,31 @@ class _DataMarginState extends State<DataMargin>
 
                 const SizedBox(height: 12),
 
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: OutlinedButton.icon(
-                    icon: const Icon(Icons.visibility),
-                    label: const Text("Detail"),
-                    onPressed: () {
-                      _showDetailDialog(item);
-                    },
-                  ),
+                //button  edit dan detail
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    OutlinedButton.icon(
+                      icon: const Icon(Icons.delete),
+                      label: const Text(
+                        "Hapus",
+                        style: TextStyle(),
+                      ),
+                      onPressed: () {
+                        _showDeleteDialog(item);
+                      },
+                    ),
+
+                    const SizedBox(width: 8),
+
+                    ElevatedButton.icon(
+                      icon: const Icon(Icons.edit),
+                      label: const Text("Edit"),
+                      onPressed: () {
+                        _showEditDialog(item);
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -185,6 +202,111 @@ class _DataMarginState extends State<DataMargin>
       },
     );
   }
+
+  void _showEditDialog(Map<String, dynamic> item) {
+  final hargaJualCtrl = TextEditingController(
+    text: item['harga_jual'].toString(),
+  );
+
+  showDialog(
+    context: context,
+    builder: (_) => AlertDialog(
+      title: const Text("Edit Margin"),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Supplier : ${item['supplier']}"),
+          Text("Batch : ${item['name']}"),
+
+          const SizedBox(height: 15),
+
+          TextField(
+            controller: hargaJualCtrl,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(
+              labelText: "Harga Jual",
+              border: OutlineInputBorder(),
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text("Batal"),
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            final hargaJual =
+                int.tryParse(hargaJualCtrl.text) ?? 0;
+
+            await editBatch(
+              field: "harga_jual",
+              value: hargaJual,
+              batchId: item['id'].toString(),
+            );
+
+            Navigator.pop(context);
+
+            await _loadMarginData();
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("Data berhasil diupdate"),
+              ),
+            );
+          },
+          child: const Text("Update"),
+        ),
+      ],
+    ),
+  );
+}
+
+
+void _showDeleteDialog(Map<String, dynamic> item) {
+  showDialog(
+    context: context,
+    builder: (_) => AlertDialog(
+      title: const Text("Konfirmasi Hapus"),
+      content: Text(
+        "Apakah Anda yakin ingin menghapus data margin ${item['name']} ?",
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text("Batal"),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red,
+          ),
+          onPressed: () async {
+            await deleteMargin(
+              item['id'].toString(),
+            );
+
+            Navigator.pop(context);
+
+            await _loadMarginData();
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("Data berhasil dihapus"),
+              ),
+            );
+          },
+          child: const Text(
+            "Hapus",
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
 
   void _showDetailDialog(Map<String, dynamic> item) {
     showDialog(

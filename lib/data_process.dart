@@ -4,6 +4,7 @@ import 'package:flutter_application_1/services/get_batch.dart';
 import 'package:flutter_application_1/services/check_batch.dart';
 import 'package:flutter_application_1/services/edit_batch.dart';
 import 'package:flutter_application_1/services/get_processed_data.dart';
+import 'package:flutter_application_1/services/delete_batch.dart';
 
 // ─────────────────────────────────────────────
 // Model
@@ -15,11 +16,9 @@ class _KomposisiItem {
   final TextEditingController beratAkhirCtrl;
   final TextEditingController susutCtrl;
 
-  _KomposisiItem({
-    required this.label,
-    required this.beratAwalValue,
-  })  : beratAkhirCtrl = TextEditingController(text: '0'),
-        susutCtrl = TextEditingController(text: '0');
+  _KomposisiItem({required this.label, required this.beratAwalValue})
+    : beratAkhirCtrl = TextEditingController(text: '0'),
+      susutCtrl = TextEditingController(text: '0');
 
   String get beratAwalString => beratAwalValue.toStringAsFixed(2);
   double get beratAkhir => double.tryParse(beratAkhirCtrl.text) ?? 0;
@@ -99,19 +98,18 @@ class _DataProcessState extends State<DataProcess> {
   }
 
   Future<void> _loadProcessedData() async {
-  try {
-    final data = await getProcessedData();
+    try {
+      final data = await getProcessedData();
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    setState(() {
-      _processedData = data;
-    });
-  } catch (e) {
-    _showError('Gagal memuat data proses: $e');
+      setState(() {
+        _processedData = data;
+      });
+    } catch (e) {
+      _showError('Gagal memuat data proses: $e');
+    }
   }
-}
-
 
   Future<void> _onBatchChanged(String? batchId) async {
     if (batchId == null) return;
@@ -133,16 +131,17 @@ class _DataProcessState extends State<DataProcess> {
       final labels = komposisiWajibConfig[namaBarang] ?? [];
       final detail = await getBatchDetails(batchId);
 
-      final items = labels.map((label) {
-        final key = label.split(' ').last.trim();
-        final match = detail.firstWhere(
-          (d) => d['komposisi'].toString().trim() == key,
-          orElse: () => {},
-        );
-        final berat =
-            double.tryParse(match['berat']?.toString() ?? '') ?? 0.0;
-        return _KomposisiItem(label: label, beratAwalValue: berat);
-      }).toList();
+      final items =
+          labels.map((label) {
+            final key = label.split(' ').last.trim();
+            final match = detail.firstWhere(
+              (d) => d['komposisi'].toString().trim() == key,
+              orElse: () => {},
+            );
+            final berat =
+                double.tryParse(match['berat']?.toString() ?? '') ?? 0.0;
+            return _KomposisiItem(label: label, beratAwalValue: berat);
+          }).toList();
 
       setState(() => _komposisiItems = items);
     } catch (e) {
@@ -212,71 +211,71 @@ class _DataProcessState extends State<DataProcess> {
   // ── Build ─────────────────────────────────────
 
   @override
-Widget build(BuildContext context) {
-  return DefaultTabController(
-    length: 2,
-    child: Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
-      body: _isLoading && _dataBatch.isEmpty
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                Container(
-                  color: Colors.white,
-                  child: const TabBar(
-                    labelColor: Colors.blue,
-                    unselectedLabelColor: Colors.grey,
-                    indicatorColor: Colors.blue,
-                    tabs: [
-                      Tab(text: 'Input Data'),
-                      Tab(text: 'Data Tersimpan'),
-                    ],
-                  ),
-                ),
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF5F6FA),
+        body:
+            _isLoading && _dataBatch.isEmpty
+                ? const Center(child: CircularProgressIndicator())
+                : Column(
+                  children: [
+                    Container(
+                      color: Colors.white,
+                      child: const TabBar(
+                        labelColor: Colors.blue,
+                        unselectedLabelColor: Colors.grey,
+                        indicatorColor: Colors.blue,
+                        tabs: [
+                          Tab(text: 'Input Data'),
+                          Tab(text: 'Data Tersimpan'),
+                        ],
+                      ),
+                    ),
 
-                Expanded(
-                  child: TabBarView(
-                    children: [
-                      // TAB INPUT DATA
-                      SingleChildScrollView(
-                        padding: const EdgeInsets.all(16),
-                        child: Form(
-                          key: _formKey,
-                          child: Column(
-                            crossAxisAlignment:
-                                CrossAxisAlignment.start,
-                            children: [
-                              _buildCard(
+                    Expanded(
+                      child: TabBarView(
+                        children: [
+                          // TAB INPUT DATA
+                          SingleChildScrollView(
+                            padding: const EdgeInsets.all(16),
+                            child: Form(
+                              key: _formKey,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  _buildSectionTitle('Data Batch'),
-                                  const SizedBox(height: 8),
-                                  _buildBatchDropdown(),
+                                  _buildCard(
+                                    children: [
+                                      _buildSectionTitle('Data Batch'),
+                                      const SizedBox(height: 8),
+                                      _buildBatchDropdown(),
+                                      const SizedBox(height: 16),
+                                      _buildSectionTitle('Metode Cuci'),
+                                      const SizedBox(height: 8),
+                                      _buildMetodeDropdown(),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 12),
+                                  _buildKomposisiSection(),
+                                  const SizedBox(height: 20),
+                                  _buildSaveButton(),
                                   const SizedBox(height: 16),
-                                  _buildSectionTitle('Metode Cuci'),
-                                  const SizedBox(height: 8),
-                                  _buildMetodeDropdown(),
                                 ],
                               ),
-                              const SizedBox(height: 12),
-                              _buildKomposisiSection(),
-                              const SizedBox(height: 20),
-                              _buildSaveButton(),
-                              const SizedBox(height: 16),
-                            ],
+                            ),
                           ),
-                        ),
-                      ),
 
-                      // TAB DATA TERSIMPAN
-                      _buildDataTersimpanTab(),
-                    ],
-                  ),
+                          // TAB DATA TERSIMPAN
+                          _buildDataTersimpanTab(),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-    ),
-  );
-}
+      ),
+    );
+  }
 
   // @override
   // Widget build(BuildContext context) {
@@ -353,13 +352,13 @@ Widget build(BuildContext context) {
   }
 
   Widget _buildSectionTitle(String title) => Text(
-        title,
-        style: const TextStyle(
-          fontWeight: FontWeight.w600,
-          fontSize: 14,
-          color: Colors.black87,
-        ),
-      );
+    title,
+    style: const TextStyle(
+      fontWeight: FontWeight.w600,
+      fontSize: 14,
+      color: Colors.black87,
+    ),
+  );
 
   Widget _buildBatchDropdown() {
     return DropdownButtonFormField<String>(
@@ -367,16 +366,17 @@ Widget build(BuildContext context) {
       hint: const Text('Pilih Batch'),
       isExpanded: true,
       decoration: _inputDecoration(),
-      items: _dataBatch.map((batch) {
-        return DropdownMenuItem<String>(
-          value: batch['id'].toString(),
-          child: Text(
-            '${batch['supplier']} – ${batch['name']} – ${batch['date']}',
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 14),
-          ),
-        );
-      }).toList(),
+      items:
+          _dataBatch.map((batch) {
+            return DropdownMenuItem<String>(
+              value: batch['id'].toString(),
+              child: Text(
+                '${batch['supplier']} – ${batch['name']} – ${batch['date']}',
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontSize: 14),
+              ),
+            );
+          }).toList(),
       onChanged: _isLoading ? null : _onBatchChanged,
       validator: (v) => v == null ? 'Batch harus dipilih' : null,
     );
@@ -388,9 +388,10 @@ Widget build(BuildContext context) {
       hint: const Text('Pilih Metode Cuci'),
       isExpanded: true,
       decoration: _inputDecoration(),
-      items: _metodeCuciOptions
-          .map((m) => DropdownMenuItem(value: m, child: Text(m)))
-          .toList(),
+      items:
+          _metodeCuciOptions
+              .map((m) => DropdownMenuItem(value: m, child: Text(m)))
+              .toList(),
       onChanged: (v) => setState(() => _selectedMetodeCuci = v),
       validator: (v) => v == null ? 'Metode cuci harus dipilih' : null,
     );
@@ -407,33 +408,37 @@ Widget build(BuildContext context) {
     }
 
     if (_selectedBatchId != null && _komposisiItems.isEmpty) {
-      return _buildCard(children: [
-        Row(
-          children: [
-            Icon(Icons.warning_amber_rounded, color: Colors.orange.shade600),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                'Komposisi tidak ditemukan untuk batch ini.',
-                style: TextStyle(color: Colors.orange.shade800, fontSize: 14),
+      return _buildCard(
+        children: [
+          Row(
+            children: [
+              Icon(Icons.warning_amber_rounded, color: Colors.orange.shade600),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Komposisi tidak ditemukan untuk batch ini.',
+                  style: TextStyle(color: Colors.orange.shade800, fontSize: 14),
+                ),
               ),
-            ),
-          ],
-        ),
-      ]);
+            ],
+          ),
+        ],
+      );
     }
 
     if (_komposisiItems.isEmpty) return const SizedBox.shrink();
 
-    return _buildCard(children: [
-      _buildSectionTitle('Komposisi'),
-      const SizedBox(height: 12),
-      // Header
-      _buildKomposisiHeader(),
-      Divider(color: Colors.grey.shade200),
-      // Rows
-      ..._komposisiItems.map(_buildKomposisiRow),
-    ]);
+    return _buildCard(
+      children: [
+        _buildSectionTitle('Komposisi'),
+        const SizedBox(height: 12),
+        // Header
+        _buildKomposisiHeader(),
+        Divider(color: Colors.grey.shade200),
+        // Rows
+        ..._komposisiItems.map(_buildKomposisiRow),
+      ],
+    );
   }
 
   Widget _buildKomposisiHeader() {
@@ -486,8 +491,9 @@ Widget build(BuildContext context) {
             flex: 3,
             child: TextFormField(
               controller: item.beratAkhirCtrl,
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               style: const TextStyle(fontSize: 13),
               decoration: _inputDecoration(hint: 'Berat akhir'),
               onChanged: (_) => setState(() => item.recalcSusut()),
@@ -534,228 +540,372 @@ Widget build(BuildContext context) {
             borderRadius: BorderRadius.circular(10),
           ),
         ),
-        child: _isSaving
-            ? const SizedBox(
-                width: 22,
-                height: 22,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.5,
-                  color: Colors.white,
+        child:
+            _isSaving
+                ? const SizedBox(
+                  width: 22,
+                  height: 22,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    color: Colors.white,
+                  ),
+                )
+                : const Text(
+                  'Simpan',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
                 ),
-              )
-            : const Text(
-                'Simpan',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
       ),
     );
   }
 
   Widget _buildDataTersimpanTab() {
-  if (_processedData.isEmpty) {
-    return const Center(
-      child: Text('Belum ada data tersimpan'),
+    if (_processedData.isEmpty) {
+      return const Center(child: Text('Belum ada data tersimpan'));
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: _processedData.length,
+      itemBuilder: (context, index) {
+        final item = _processedData[index];
+        final batch = item['batches'];
+
+        return Card(
+          margin: const EdgeInsets.only(bottom: 12),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${batch['supplier']} - ${batch['name']}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text('Metode : ${item['metode_cuci'] ?? '-'}'),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    OutlinedButton.icon(
+                      icon: const Icon(Icons.delete),
+                      label: const Text('Hapus'),
+                      onPressed: () {
+                        _showDeleteDialog(item);
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton.icon(
+                      icon: const Icon(Icons.edit),
+                      label: const Text('Edit'),
+                      onPressed: () {
+                        _showEditDialog(item);
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
-  return ListView.builder(
-    padding: const EdgeInsets.all(16),
-    itemCount: _processedData.length,
-    itemBuilder: (context, index) {
-      final item = _processedData[index];
-      final batch = item['batches'];
+  void _showDetailDialog(Map<String, dynamic> item) {
+    final batch = item['batches'];
 
-      return Card(
-        margin: const EdgeInsets.only(bottom: 12),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '${batch['supplier']} - ${batch['name']}',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
-                ),
+    showDialog(
+      context: context,
+      builder:
+          (_) => AlertDialog(
+            title: const Text('Detail Data Proses'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Supplier : ${batch['supplier']}'),
+                Text('Batch : ${batch['name']}'),
+                Text('Komposisi : ${item['komposisi']}'),
+                Text('Berat Awal : ${item['berat']}'),
+                Text('Berat Akhir : ${item['berat_akhir']}'),
+                Text('Metode : ${item['metode_cuci']}'),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Tutup'),
               ),
-              const SizedBox(height: 4),
-              Text(
-                'Metode : ${item['metode_cuci'] ?? '-'}',
-              ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+            ],
+          ),
+    );
+  }
+
+  // void _showDetailDialog(Map<String, dynamic> item) {
+  //   final batch = item['batches'];
+
+  //   showDialog(
+  //     context: context,
+  //     builder: (_) => AlertDialog(
+  //       title: const Text('Detail Data Proses'),
+  //       content: Column(
+  //         mainAxisSize: MainAxisSize.min,
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           Text('Supplier : ${batch['supplier']}'),
+  //           Text('Batch : ${batch['name']}'),
+  //           Text('Komposisi : ${item['komposisi']}'),
+  //           Text('Berat Awal : ${item['berat']}'),
+  //           Text('Berat Akhir : ${item['berat_akhir']}'),
+  //           Text('Metode : ${item['metode_cuci']}'),
+  //         ],
+  //       ),
+  //       actions: [
+  //         TextButton(
+  //           onPressed: () => Navigator.pop(context),
+  //           child: const Text('Tutup'),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
+  void _showEditDialog(Map<String, dynamic> item) {
+    final batch = item['batches'];
+
+    final beratCtrl = TextEditingController(
+      text: item['berat_akhir']?.toString() ?? '',
+    );
+
+    String metode = item['metode_cuci']?.toString() ?? 'Cabut Kering';
+
+    showDialog(
+      context: context,
+      builder:
+          (_) => AlertDialog(
+            title: const Text('Edit Data Proses'),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  OutlinedButton.icon(
-                    icon: const Icon(Icons.visibility),
-                    label: const Text('Detail'),
-                    onPressed: () {
-                      _showDetailDialog(item);
-                    },
+                  Text('Supplier : ${batch['supplier']}'),
+                  Text('Batch : ${batch['name']}'),
+                  Text('Komposisi : ${item['komposisi']}'),
+
+                  const SizedBox(height: 12),
+
+                  TextField(
+                    controller: beratCtrl,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: 'Berat Akhir',
+                      border: OutlineInputBorder(),
+                    ),
                   ),
-                  const SizedBox(width: 8),
-                  ElevatedButton.icon(
-                    icon: const Icon(Icons.edit),
-                    label: const Text('Edit'),
-                    onPressed: () {
-                      _showEditDialog(item);
+
+                  const SizedBox(height: 12),
+
+                  DropdownButtonFormField<String>(
+                    value: metode,
+                    decoration: const InputDecoration(
+                      labelText: 'Metode Cuci',
+                      border: OutlineInputBorder(),
+                    ),
+                    items:
+                        _metodeCuciOptions
+                            .map(
+                              (e) => DropdownMenuItem(value: e, child: Text(e)),
+                            )
+                            .toList(),
+                    onChanged: (value) {
+                      metode = value!;
                     },
                   ),
                 ],
               ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Batal'),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  await editBatchWithDetails(
+                    batchId: item['id'].toString(),
+                    metodeCuci: metode,
+                    komposisi: item['komposisi'],
+                    beratAkhir: beratCtrl.text,
+                  );
+
+                  Navigator.pop(context);
+
+                  await _loadProcessedData();
+
+                  _showSuccess('Data berhasil diupdate');
+                },
+                child: const Text('Update'),
+              ),
             ],
           ),
-        ),
-      );
-    },
-  );
-}
+    );
+  }
 
+  void _showDeleteDialog(Map<String, dynamic> item) {
+    showDialog(
+      context: context,
+      builder:
+          (_) => AlertDialog(
+            title: const Text('Konfirmasi Hapus'),
+            content: const Text('Apakah Anda yakin ingin menghapus data ini?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Batal'),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                onPressed: () async {
+                  bool success = await deleteBatchDetail(item['id'].toString());
 
-void _showDetailDialog(Map<String, dynamic> item) {
-  final batch = item['batches'];
+                  if (success) {
+                    Navigator.pop(context);
 
-  showDialog(
-    context: context,
-    builder: (_) => AlertDialog(
-      title: const Text('Detail Data Proses'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Supplier : ${batch['supplier']}'),
-          Text('Batch : ${batch['name']}'),
-          Text('Komposisi : ${item['komposisi']}'),
-          Text('Berat Awal : ${item['berat']}'),
-          Text('Berat Akhir : ${item['berat_akhir']}'),
-          Text('Metode : ${item['metode_cuci']}'),
-        ],
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Tutup'),
-        ),
-      ],
-    ),
-  );
-}
+                    await _loadProcessedData();
 
-void _showEditDialog(Map<String, dynamic> item) {
-  final beratCtrl = TextEditingController(
-    text: item['berat_akhir']?.toString() ?? '',
-  );
-
-  String metode =
-      item['metode_cuci']?.toString() ?? 'Cabut Kering';
-
-  showDialog(
-    context: context,
-    builder: (_) => AlertDialog(
-      title: const Text('Edit Data Proses'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(item['komposisi']),
-
-          const SizedBox(height: 12),
-
-          TextField(
-            controller: beratCtrl,
-            decoration: const InputDecoration(
-              labelText: 'Berat Akhir',
-            ),
+                    _showSuccess('Data berhasil dihapus');
+                  } else {
+                    _showError('Data gagal dihapus');
+                  }
+                },
+                child: const Text(
+                  'Hapus',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
           ),
+    );
+  }
 
-          const SizedBox(height: 12),
+  // void _showEditDialog(Map<String, dynamic> item) {
+  //   final beratCtrl = TextEditingController(
+  //     text: item['berat_akhir']?.toString() ?? '',
+  //   );
 
-          DropdownButtonFormField<String>(
-            value: metode,
-            items: _metodeCuciOptions
-                .map(
-                  (e) => DropdownMenuItem(
-                    value: e,
-                    child: Text(e),
-                  ),
-                )
-                .toList(),
-            onChanged: (value) {
-              metode = value!;
-            },
-          ),
-        ],
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Batal'),
-        ),
+  //   String metode =
+  //       item['metode_cuci']?.toString() ?? 'Cabut Kering';
 
-        ElevatedButton(
-          onPressed: () async {
-            await editBatchWithDetails(
-              batchId: item['id'].toString(),
-              metodeCuci: metode,
-              komposisi: item['komposisi'],
-              beratAkhir: beratCtrl.text,
-            );
+  //   showDialog(
+  //     context: context,
+  //     builder: (_) => AlertDialog(
+  //       title: const Text('Edit Data Proses'),
+  //       content: Column(
+  //         mainAxisSize: MainAxisSize.min,
+  //         children: [
+  //           Text(item['komposisi']),
 
-            Navigator.pop(context);
+  //           const SizedBox(height: 12),
 
-            _loadProcessedData();
+  //           TextField(
+  //             controller: beratCtrl,
+  //             decoration: const InputDecoration(
+  //               labelText: 'Berat Akhir',
+  //             ),
+  //           ),
 
-            _showSuccess('Data berhasil diupdate');
-          },
-          child: const Text('Update'),
-        ),
-      ],
-    ),
-  );
-}
+  //           const SizedBox(height: 12),
 
-//       return Card(
-//         child: ListTile(
-//           title: Text(
-//             '${batch['supplier']} - ${batch['name']}',
-//           ),
-//           subtitle: Text(
-//             'Metode : ${item['metode_cuci'] ?? '-'}',
-//           ),
-//         ),
-//       );
-//     },
-//   );
-// }
+  //           DropdownButtonFormField<String>(
+  //             value: metode,
+  //             items: _metodeCuciOptions
+  //                 .map(
+  //                   (e) => DropdownMenuItem(
+  //                     value: e,
+  //                     child: Text(e),
+  //                   ),
+  //                 )
+  //                 .toList(),
+  //             onChanged: (value) {
+  //               metode = value!;
+  //             },
+  //           ),
+  //         ],
+  //       ),
+  //       actions: [
+  //         TextButton(
+  //           onPressed: () => Navigator.pop(context),
+  //           child: const Text('Batal'),
+  //         ),
+
+  //         ElevatedButton(
+  //           onPressed: () async {
+  //             await editBatchWithDetails(
+  //               batchId: item['id'].toString(),
+  //               metodeCuci: metode,
+  //               komposisi: item['komposisi'],
+  //               beratAkhir: beratCtrl.text,
+  //             );
+
+  //             Navigator.pop(context);
+
+  //             _loadProcessedData();
+
+  //             _showSuccess('Data berhasil diupdate');
+  //           },
+  //           child: const Text('Update'),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
+  //       return Card(
+  //         child: ListTile(
+  //           title: Text(
+  //             '${batch['supplier']} - ${batch['name']}',
+  //           ),
+  //           subtitle: Text(
+  //             'Metode : ${item['metode_cuci'] ?? '-'}',
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
 
   InputDecoration _inputDecoration({String? hint}) => InputDecoration(
-        hintText: hint,
-        hintStyle: const TextStyle(fontSize: 13, color: Colors.black38),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.grey.shade300),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.grey.shade300),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.blue.shade400, width: 1.5),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Colors.red),
-        ),
-        isDense: true,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        filled: true,
-        fillColor: Colors.grey.shade50,
-        errorStyle: const TextStyle(fontSize: 10),
-      );
+    hintText: hint,
+    hintStyle: const TextStyle(fontSize: 13, color: Colors.black38),
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: BorderSide(color: Colors.grey.shade300),
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: BorderSide(color: Colors.grey.shade300),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: BorderSide(color: Colors.blue.shade400, width: 1.5),
+    ),
+    errorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: const BorderSide(color: Colors.red),
+    ),
+    isDense: true,
+    contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+    filled: true,
+    fillColor: Colors.grey.shade50,
+    errorStyle: const TextStyle(fontSize: 10),
+  );
 }

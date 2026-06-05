@@ -100,17 +100,57 @@ class _LaporanState extends State<Laporan> {
         pageFormat: PdfPageFormat.a4,
 
         build: (context) => [
-          pw.Text(
-            'Laporan Profit',
-            style: pw.TextStyle(
-              fontSize: 22,
-              fontWeight: pw.FontWeight.bold,
-            ),
+
+  pw.Center(
+    child: pw.Column(
+      children: [
+        pw.Text(
+          'PT GLOBAL JAYA SEJAHTERA MANDIRI',
+          style: pw.TextStyle(
+            fontSize: 18,
+            fontWeight: pw.FontWeight.bold,
           ),
+        ),
 
-          pw.SizedBox(height: 20),
+        pw.SizedBox(height: 5),
 
-          pw.Table(
+        pw.Text(
+          'LAPORAN KEUANGAN DAN PROFIT',
+          style: pw.TextStyle(
+            fontSize: 14,
+            fontWeight: pw.FontWeight.bold,
+          ),
+        ),
+
+        pw.SizedBox(height: 3),
+
+        pw.Text(
+          'Tanggal Cetak : ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
+          style: const pw.TextStyle(
+            fontSize: 10,
+          ),
+        ),
+      ],
+    ),
+  ),
+
+  pw.SizedBox(height: 10),
+
+  pw.Divider(),
+
+  pw.SizedBox(height: 20),
+
+  pw.Text(
+    'Ringkasan Keuangan',
+    style: pw.TextStyle(
+      fontSize: 16,
+      fontWeight: pw.FontWeight.bold,
+    ),
+  ),
+
+  pw.SizedBox(height: 10),
+
+  pw.Table(
             border: pw.TableBorder.all(),
 
             children: [
@@ -166,6 +206,8 @@ class _LaporanState extends State<Laporan> {
                 ],
               ),
 
+              
+
               ...batches.map(
                 (e) => pw.TableRow(
                   children: [
@@ -193,6 +235,29 @@ class _LaporanState extends State<Laporan> {
               ),
             ],
           ),
+
+          pw.SizedBox(height: 40),
+
+pw.Align(
+  alignment: pw.Alignment.centerRight,
+  child: pw.Column(
+    children: [
+      pw.Text(
+        'Pontianak, ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
+      ),
+
+      pw.SizedBox(height: 50),
+
+      pw.Text(
+        'Manager Operasional',
+        style: pw.TextStyle(
+          fontWeight: pw.FontWeight.bold,
+        ),
+      ),
+    ],
+  ),
+),
+
         ],
       ),
     );
