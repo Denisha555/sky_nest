@@ -549,8 +549,8 @@ class _DataProcessState extends State<DataProcess>  with SingleTickerProviderSta
                     color: Colors.white,
                   ),
                 )
-                : const Text(
-                  'Simpan',
+                : Text(
+                  _isEdit ? 'Ubah' : 'Simpan',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -601,7 +601,7 @@ class _DataProcessState extends State<DataProcess>  with SingleTickerProviderSta
       itemCount: _savedBatch.length,
       itemBuilder: (context, index) {
         final item = _savedBatch[index];
-        final batch = item['batches'];
+        final metodeCuci = item['batches_details'][0]['metode_cuci'];
 
         return Card(
           margin: const EdgeInsets.only(bottom: 12),
@@ -638,8 +638,8 @@ class _DataProcessState extends State<DataProcess>  with SingleTickerProviderSta
                           // _showEditDialog(item);
                         setState(() {
                           _isEdit = true;
-                          _selectedBatchId = item['batch_id'];
-                          _selectedMetodeCuci = item['metode_cuci'];
+                          _selectedBatchId = item['id'];
+                          _selectedMetodeCuci = metodeCuci;
                         });
                         
                         _tabController.animateTo(0);
