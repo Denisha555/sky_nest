@@ -70,6 +70,30 @@ Future<int> getTotalModalThisMonth() async {
   }
 }
 
+Future<List<Map<String, dynamic>>> getAllBatchDetail() async {
+  try {
+  final response = await Supabase.instance.client
+      .from('batches')
+      .select('''
+          *,
+          batches_details!inner(
+          *
+          )
+      '''
+      );
+
+  if (response.isEmpty) {
+    print('No batches found');
+    return [];
+  } else {
+    return List<Map<String, dynamic>>.from(response);
+  }
+  } catch (e) {
+    print('Error fetching batches: $e');
+    return [];
+  }
+}
+
 Future<List<Map<String, dynamic>>> getAvailableBatcForProcess() async {
   try {
   final response = await Supabase.instance.client
@@ -81,6 +105,30 @@ Future<List<Map<String, dynamic>>> getAvailableBatcForProcess() async {
           )
       '''
       ).filter("batches_details.metode_cuci", "is", null);
+
+  if (response.isEmpty) {
+    print('No batches found');
+    return [];
+  } else {
+    return List<Map<String, dynamic>>.from(response);
+  }
+  } catch (e) {
+    print('Error fetching batches: $e');
+    return [];
+  }
+}
+
+Future<List<Map<String, dynamic>>> getSavedProcess() async {
+  try {
+  final response = await Supabase.instance.client
+      .from('batches')
+      .select('''
+          *,
+          batches_details!inner(
+          *
+          )
+      '''
+      ).not("batches_details.metode_cuci", "is", null);
 
   if (response.isEmpty) {
     print('No batches found');

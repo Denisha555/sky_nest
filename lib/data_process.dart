@@ -49,7 +49,9 @@ class DataProcess extends StatefulWidget {
   State<DataProcess> createState() => _DataProcessState();
 }
 
-class _DataProcessState extends State<DataProcess> {
+class _DataProcessState extends State<DataProcess>  with SingleTickerProviderStateMixin{
+  late TabController _tabController;
+
   static const _metodeCuciOptions = [
     'Cabut Kering',
     'Cabut Basah',
@@ -62,8 +64,11 @@ class _DataProcessState extends State<DataProcess> {
   String? _selectedMetodeCuci;
   bool _isLoading = false;
   bool _isSaving = false;
+  bool _isEdit = false;
 
   List<Map<String, dynamic>> _dataBatch = [];
+  List<Map<String, dynamic>> _alldataBatch = [];
+  List<Map<String, dynamic>> _savedBatch = [];
   List<_KomposisiItem> _komposisiItems = [];
   List<Map<String, dynamic>> _processedData = [];
 
@@ -72,12 +77,18 @@ class _DataProcessState extends State<DataProcess> {
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(
+      length: 2,
+      vsync: this,
+      initialIndex: 0,
+    );
     _loadBatches();
     _loadProcessedData();
   }
 
   @override
   void dispose() {
+    _tabController.dispose();
     _disposeItems();
     super.dispose();
   }
@@ -88,8 +99,14 @@ class _DataProcessState extends State<DataProcess> {
     setState(() => _isLoading = true);
     try {
       final data = await getAvailableBatcForProcess();
+      final all = await getAllBatchDetail();
+      final saved = await getSavedProcess();
       print("data: $data");
-      setState(() => _dataBatch = data);
+      setState(() {
+        _dataBatch = data;
+        _alldataBatch = all;
+        _savedBatch = saved;
+      } );
     } catch (e) {
       _showError('Gagal memuat data batch: $e');
     } finally {
@@ -223,10 +240,11 @@ class _DataProcessState extends State<DataProcess> {
                   children: [
                     Container(
                       color: Colors.white,
-                      child: const TabBar(
+                      child: TabBar(
                         labelColor: Colors.blue,
                         unselectedLabelColor: Colors.grey,
                         indicatorColor: Colors.blue,
+                        controller: _tabController,
                         tabs: [
                           Tab(text: 'Input Data'),
                           Tab(text: 'Data Tersimpan'),
@@ -236,36 +254,10 @@ class _DataProcessState extends State<DataProcess> {
 
                     Expanded(
                       child: TabBarView(
+                        controller: _tabController,
                         children: [
                           // TAB INPUT DATA
-                          SingleChildScrollView(
-                            padding: const EdgeInsets.all(16),
-                            child: Form(
-                              key: _formKey,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  _buildCard(
-                                    children: [
-                                      _buildSectionTitle('Data Batch'),
-                                      const SizedBox(height: 8),
-                                      _buildBatchDropdown(),
-                                      const SizedBox(height: 16),
-                                      _buildSectionTitle('Metode Cuci'),
-                                      const SizedBox(height: 8),
-                                      _buildMetodeDropdown(),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 12),
-                                  _buildKomposisiSection(),
-                                  const SizedBox(height: 20),
-                                  _buildSaveButton(),
-                                  const SizedBox(height: 16),
-                                ],
-                              ),
-                            ),
-                          ),
-
+                          _buildInputDataTab(),
                           // TAB DATA TERSIMPAN
                           _buildDataTersimpanTab(),
                         ],
@@ -361,13 +353,20 @@ class _DataProcessState extends State<DataProcess> {
   );
 
   Widget _buildBatchDropdown() {
+    List<Map<String, dynamic>> data = [];
+    if (_isEdit) {
+      data = _alldataBatch;
+    } else {
+      data = _dataBatch;
+    }
+
     return DropdownButtonFormField<String>(
       value: _selectedBatchId,
       hint: const Text('Pilih Batch'),
       isExpanded: true,
       decoration: _inputDecoration(),
       items:
-          _dataBatch.map((batch) {
+          data.map((batch) {
             return DropdownMenuItem<String>(
               value: batch['id'].toString(),
               child: Text(
@@ -562,16 +561,46 @@ class _DataProcessState extends State<DataProcess> {
     );
   }
 
+  Widget _buildInputDataTab() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildCard(
+              children: [
+                _buildSectionTitle('Data Batch'),
+                const SizedBox(height: 8),
+                _buildBatchDropdown(),
+                const SizedBox(height: 16),
+                _buildSectionTitle('Metode Cuci'),
+                const SizedBox(height: 8),
+                _buildMetodeDropdown(),
+              ],
+            ),
+            const SizedBox(height: 12),
+            _buildKomposisiSection(),
+            const SizedBox(height: 20),
+            _buildSaveButton(),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildDataTersimpanTab() {
-    if (_processedData.isEmpty) {
+    if (_dataBatch.isEmpty) {
       return const Center(child: Text('Belum ada data tersimpan'));
     }
 
     return ListView.builder(
       padding: const EdgeInsets.all(16),
-      itemCount: _processedData.length,
+      itemCount: _savedBatch.length,
       itemBuilder: (context, index) {
-        final item = _processedData[index];
+        final item = _savedBatch[index];
         final batch = item['batches'];
 
         return Card(
@@ -582,14 +611,14 @@ class _DataProcessState extends State<DataProcess> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${batch['supplier']} - ${batch['name']}',
+                  'Nama Supplier : ${item['supplier']}',
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 15,
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text('Metode : ${item['metode_cuci'] ?? '-'}'),
+                Text('Nama Barang : ${item['name']}'),
                 const SizedBox(height: 12),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -606,7 +635,14 @@ class _DataProcessState extends State<DataProcess> {
                       icon: const Icon(Icons.edit),
                       label: const Text('Edit'),
                       onPressed: () {
-                        _showEditDialog(item);
+                          // _showEditDialog(item);
+                        setState(() {
+                          _isEdit = true;
+                          _selectedBatchId = item['batch_id'];
+                          _selectedMetodeCuci = item['metode_cuci'];
+                        });
+                        
+                        _tabController.animateTo(0);
                       },
                     ),
                   ],
