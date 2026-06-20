@@ -139,7 +139,7 @@ class _DataProcessState extends State<DataProcess>  with SingleTickerProviderSta
     });
 
     try {
-      final selectedBatch = _dataBatch.firstWhere(
+      final selectedBatch = _alldataBatch.firstWhere(
         (b) => b['id'].toString() == batchId,
         orElse: () => {},
       );
@@ -634,13 +634,15 @@ class _DataProcessState extends State<DataProcess>  with SingleTickerProviderSta
                     ElevatedButton.icon(
                       icon: const Icon(Icons.edit),
                       label: const Text('Edit'),
-                      onPressed: () {
+                      onPressed: () async {
                           // _showEditDialog(item);
                         setState(() {
                           _isEdit = true;
                           _selectedBatchId = item['id'];
                           _selectedMetodeCuci = metodeCuci;
                         });
+
+                         await _onBatchChanged(item['id'].toString());
                         
                         _tabController.animateTo(0);
                       },
