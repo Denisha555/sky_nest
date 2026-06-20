@@ -184,6 +184,7 @@ class _DataProcessState extends State<DataProcess>  with SingleTickerProviderSta
           beratAkhir: item.beratAkhir.toString(),
         );
       }
+      _isEdit = false;
       if (mounted) {
         _showSuccess('Data berhasil disimpan');
         Navigator.pop(context);
