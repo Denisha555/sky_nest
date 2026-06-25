@@ -66,6 +66,10 @@ class _DataProcessState extends State<DataProcess>  with SingleTickerProviderSta
   bool _isSaving = false;
   bool _isEdit = false;
 
+  //variabel mode edit
+bool _isEdit = false;
+String? _editBatchId;
+
   List<Map<String, dynamic>> _dataBatch = [];
   List<Map<String, dynamic>> _alldataBatch = [];
   List<Map<String, dynamic>> _savedBatch = [];
