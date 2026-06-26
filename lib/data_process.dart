@@ -64,8 +64,7 @@ class _DataProcessState extends State<DataProcess>  with SingleTickerProviderSta
   String? _selectedMetodeCuci;
   bool _isLoading = false;
   bool _isSaving = false;
-  bool _isEdit = false;
-
+ 
   //variabel mode edit
 bool _isEdit = false;
 String? _editBatchId;
