@@ -190,7 +190,6 @@ String? _editBatchId;
       _isEdit = false;
       if (mounted) {
         _showSuccess('Data berhasil disimpan');
-        Navigator.pop(context);
       }
     } catch (e) {
       _showError('Gagal menyimpan data: $e');

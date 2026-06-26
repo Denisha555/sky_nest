@@ -15,10 +15,10 @@ class DataMargin extends StatefulWidget {
 //
 class _DataMarginState extends State<DataMargin>
     with SingleTickerProviderStateMixin {
-      
   final _formKey = GlobalKey<FormState>();
 
   List<Map<String, dynamic>> batch = [];
+  List<Map<String, dynamic>> allBatch = [];
   List<Map<String, dynamic>> _marginData = [];
 
   // int _selectedTab = 0;
@@ -29,8 +29,6 @@ class _DataMarginState extends State<DataMargin>
   bool _isEdit = false;
   String? _editMarginId;
   int hargaBeli = 0;
-
-  
 
   TextEditingController ongkosCuciCtrl = TextEditingController(text: "0");
   TextEditingController ongkosKirimCtrl = TextEditingController(text: "0");
@@ -74,8 +72,10 @@ class _DataMarginState extends State<DataMargin>
 
   Future<void> _getBatchData() async {
     final temp = await getAvailableBatchForMargin();
+    final all = await getAllBatchForMargin();
     setState(() {
       batch = temp;
+      allBatch = all;
     });
   }
 
@@ -183,10 +183,7 @@ class _DataMarginState extends State<DataMargin>
                   children: [
                     OutlinedButton.icon(
                       icon: const Icon(Icons.delete),
-                      label: const Text(
-                        "Hapus",
-                        style: TextStyle(),
-                      ),
+                      label: const Text("Hapus", style: TextStyle()),
                       onPressed: () {
                         _showDeleteDialog(item);
                       },
@@ -194,42 +191,38 @@ class _DataMarginState extends State<DataMargin>
 
                     const SizedBox(width: 8),
 
-ElevatedButton.icon(
-  icon: const Icon(Icons.edit),
-  label: const Text("Edit"),
+                    ElevatedButton.icon(
+                      icon: const Icon(Icons.edit),
+                      label: const Text("Edit"),
 
-  onPressed: () {
+                      onPressed: () {
+                        setState(() {
+                          _isEdit = true;
 
-    setState(() {
+                          _editMarginId = item['id'].toString();
 
-      _isEdit = true;
+                          //tampilkan batch lama
+                          selectedBatch = item['id']?.toString();
 
-      _editMarginId =
-          item['id'].toString();
+                          // isi semua form
+                          hargaJualCtrl.text =
+                              (item['harga_jual'] ?? 0).toString();
 
-      //tampilkan batch lama
-      selectedBatch =
-          item['batch_id']?.toString();
+                          ongkosCuciCtrl.text =
+                              (item['ongkos_cuci'] ?? 0).toString();
 
-      // isi semua form
-      hargaJualCtrl.text =
-          (item['harga_jual'] ?? 0).toString();
+                          ongkosKirimCtrl.text =
+                              (item['ongkos_kirim'] ?? 0).toString();
 
-      ongkosCuciCtrl.text =
-          (item['ongkos_cuci']?? 0).toString();
+                          biayaLainCtrl.text =
+                              (item['biaya_lain'] ?? 0).toString();
 
-      ongkosKirimCtrl.text =
-          (item['ongkos_kirim']?? 0).toString();
+                          //selectedBatch = null;
+                        });
 
-      biayaLainCtrl.text =
-          (item['biaya_lain']?? 0).toString();
-
-      //selectedBatch = null;
-    });
-
-    _tabController.animateTo(0);
-  },
-),
+                        _tabController.animateTo(0);
+                      },
+                    ),
                   ],
                 ),
               ],
@@ -241,109 +234,153 @@ ElevatedButton.icon(
   }
 
   void _showEditDialog(Map<String, dynamic> item) {
-  final hargaJualCtrl = TextEditingController(
-    text: item['harga_jual'].toString(),
-  );
+    final hargaJualCtrl = TextEditingController(
+      text: item['harga_jual'].toString(),
+    );
 
-  showDialog(
-    context: context,
-    builder: (_) => AlertDialog(
-      title: const Text("Edit Margin"),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("Supplier : ${item['supplier']}"),
-          Text("Batch : ${item['name']}"),
+    showDialog(
+      context: context,
+      builder:
+          (_) => AlertDialog(
+            title: const Text("Edit Margin"),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Supplier : ${item['supplier']}"),
+                Text("Batch : ${item['name']}"),
 
-          const SizedBox(height: 15),
+                const SizedBox(height: 15),
 
-          TextField(
-            controller: hargaJualCtrl,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: "Harga Jual",
-              border: OutlineInputBorder(),
+                TextField(
+                  controller: hargaJualCtrl,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: "Harga Jual",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text("Batal"),
-        ),
-        ElevatedButton(
-          onPressed: () async {
-            final hargaJual =
-                int.tryParse(hargaJualCtrl.text) ?? 0;
-
-            await editBatch(
-              field: "harga_jual",
-              value: hargaJual,
-              batchId: item['id'].toString(),
-            );
-
-            Navigator.pop(context);
-
-            await _loadMarginData();
-
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text("Data berhasil diupdate"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("Batal"),
               ),
-            );
-          },
-          child: const Text("Update"),
-        ),
-      ],
-    ),
-  );
-}
+              ElevatedButton(
+                onPressed: () async {
+                  final hargaJual = int.tryParse(hargaJualCtrl.text) ?? 0;
 
+                  await editBatch(
+                    field: "harga_jual",
+                    value: hargaJual,
+                    batchId: item['id'].toString(),
+                  );
 
-void _showDeleteDialog(Map<String, dynamic> item) {
-  showDialog(
-    context: context,
-    builder: (_) => AlertDialog(
-      title: const Text("Konfirmasi Hapus"),
-      content: Text(
-        "Apakah Anda yakin ingin menghapus data margin ${item['name']} ?",
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text("Batal"),
-        ),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.red,
-          ),
-          onPressed: () async {
-            await deleteMargin(
-              item['id'].toString(),
-            );
+                  Navigator.pop(context);
 
-            Navigator.pop(context);
+                  await _loadMarginData();
 
-            await _loadMarginData();
-
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text("Data berhasil dihapus"),
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Data berhasil diupdate")),
+                  );
+                },
+                child: const Text("Update"),
               ),
-            );
-          },
-          child: const Text(
-            "Hapus",
-            style: TextStyle(color: Colors.white),
+            ],
           ),
-        ),
-      ],
-    ),
-  );
-}
+    );
+  }
 
+  void _showDeleteDialog(Map<String, dynamic> item) {
+    showDialog(
+      context: context,
+      builder:
+          (_) => AlertDialog(
+            title: const Text("Konfirmasi Hapus"),
+            content: Text(
+              "Apakah Anda yakin ingin menghapus data margin ${item['name']} ?",
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("Batal"),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                onPressed: () async {
+                  await deleteMargin(item['id'].toString());
+
+                  Navigator.pop(context);
+
+                  await _loadMarginData();
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Data berhasil dihapus")),
+                  );
+                },
+                child: const Text(
+                  "Hapus",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+    );
+  }
+
+  Future<void> _onBatchChanged(String? batchId) async {
+    if (batchId == null) return;
+
+    setState(() {
+      selectedBatch = batchId;
+    });
+
+    try {
+      final matched = allBatch.firstWhere(
+        (b) => b['id'].toString() == batchId,
+        orElse: () => {},
+      );
+
+      if (matched.isEmpty) {
+        print('Tidak ditemukan batch dengan id: $batchId');
+        return;
+      }
+
+      final batchDetail = await getBatchDetails(batchId);
+      for (var detail in batchDetail) {
+        hargaBeli =
+            hargaBeli +
+            ((detail['harga'] ?? 0) * (detail['berat'] ?? 0) as num).toInt();
+      }
+
+      final hargaJual = matched['harga_jual'] ?? 0;
+
+      int ongkosCuci = 0;
+      int ongkosKirim = 0;
+      int biayaLain = 0;
+      if (matched['expenses'].length > 0) {
+        for (var data in matched['expenses'].length - 1) {
+          if (data['name'] == 'ongkos_cuci') {
+            ongkosCuci = matched['ongkos_cuci'] ?? 0;
+          } else if (data['name'] == 'ongkos_kirim') {
+            ongkosKirim = matched['ongkos_kirim'] ?? 0;
+          } else if (data['name'] == 'biaya_lain') {
+            biayaLain = matched['biaya_lain'] ?? 0;
+          }
+        }
+      }
+
+      hargaJualCtrl.text = hargaJual.toString();
+      ongkosCuciCtrl.text = ongkosCuci.toString();
+      ongkosKirimCtrl.text = ongkosKirim.toString();
+      biayaLainCtrl.text = biayaLain.toString();
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Gagal memuat data: $e")));
+    }
+  }
 
   void _showDetailDialog(Map<String, dynamic> item) {
     showDialog(
@@ -372,6 +409,12 @@ void _showDeleteDialog(Map<String, dynamic> item) {
   }
 
   Widget _buildInputTab() {
+    List<Map<String, dynamic>> data = [];
+    if (_isEdit) {
+      data = allBatch;
+    } else {
+      data = batch;
+    }
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -387,115 +430,41 @@ void _showDeleteDialog(Map<String, dynamic> item) {
               const SizedBox(height: 6),
 
               DropdownButtonFormField<String>(
-  value: selectedBatch,
+                value: selectedBatch,
 
-  hint: const Text('Pilih Batch'),
+                hint: const Text('Pilih Batch'),
 
-  decoration: const InputDecoration(
-    isDense: true,
-    border: OutlineInputBorder(),
-    contentPadding: EdgeInsets.symmetric(
-      horizontal: 12,
-      vertical: 12,
-    ),
-  ),
+                decoration: const InputDecoration(
+                  isDense: true,
+                  border: OutlineInputBorder(),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 12,
+                  ),
+                ),
 
-  items: batch
-      .map(
-        (b) => DropdownMenuItem(
-          value: "${b["id"]}",
-          child: Text(
-            "${b['supplier']} - ${b['name']} - ${b['date']}",
-            style: const TextStyle(fontSize: 14),
-          ),
-        ),
-      )
-      .toList(),
+                items:
+                    data
+                        .map(
+                          (b) => DropdownMenuItem(
+                            value: "${b["id"]}",
+                            child: Text(
+                              "${b['supplier']} - ${b['name']} - ${b['date']}",
+                              style: const TextStyle(fontSize: 14),
+                            ),
+                          ),
+                        )
+                        .toList(),
 
-  validator:
-      (value) =>
-          value == null || value.isEmpty
-              ? 'Pilih batch terlebih dahulu'
-              : null,
+                validator:
+                    (value) =>
+                        value == null || value.isEmpty
+                            ? 'Pilih batch terlebih dahulu'
+                            : null,
 
-  onChanged: _isEdit
-      ? null
-      : (value) async {
+                onChanged: _onBatchChanged,
+              ),
 
-          List<Map<String, dynamic>> temp =
-              await getBatchDetails(value!);
-
-          int totalHarga = 0;
-
-          if (temp.isNotEmpty) {
-            for (var detail in temp) {
-              if (detail['batch_id'] == value) {
-                totalHarga +=
-                    int.tryParse(
-                      detail['harga'].toString(),
-                    ) ??
-                    0;
-              }
-            }
-          }
-
-          setState(() {
-            selectedBatch = value;
-            hargaBeli = totalHarga;
-          });
-        },
-),
-
-
-
-              // DropdownButtonFormField<String>(
-              //   value: selectedBatch,
-              //   hint: const Text('Pilih Batch'),
-              //   decoration: const InputDecoration(
-              //     isDense: true,
-              //     border: OutlineInputBorder(),
-              //     contentPadding: EdgeInsets.symmetric(
-              //       horizontal: 12,
-              //       vertical: 12,
-              //     ),
-              //   ),
-              //   items:
-              //       batch
-              //           .map(
-              //             (b) => DropdownMenuItem(
-              //               value: "${b["id"]}",
-              //               child: Text(
-              //                 "${b['supplier']} - ${b['name']} - ${b['date']}",
-              //                 style: const TextStyle(fontSize: 14),
-              //               ),
-              //             ),
-              //           )
-              //           .toList(),
-              //   validator:
-              //       (value) =>
-              //           value == null || value.isEmpty
-              //               ? 'Pilih batch terlebih dahulu'
-              //               : null,
-              //   onChanged: (value) async {
-              //     List<Map<String, dynamic>> temp = await getBatchDetails(
-              //       value!,
-              //     );
-              //     int totalHarga = 0;
-              //     if (temp.isNotEmpty) {
-              //       for (var detail in temp) {
-              //         if (detail['batch_id'] == value) {
-              //           totalHarga +=
-              //               int.tryParse(detail['harga'].toString()) ?? 0;
-              //         }
-              //       }
-              //       print("Total Harga Beli: $totalHarga");
-              //     }
-              //     setState(() {
-              //       selectedBatch = value;
-              //       hargaBeli = totalHarga;
-              //     });
-              //   },
-              // ),
               const SizedBox(height: 20),
 
               const Text(
@@ -744,81 +713,73 @@ void _showDeleteDialog(Map<String, dynamic> item) {
                 height: 50,
                 child: ElevatedButton.icon(
                   onPressed: () async {
-  if (_formKey.currentState!.validate()) {
+                    if (_formKey.currentState!.validate()) {
+                      if (_isEdit) {
+                        // MODE EDIT
+                        await editBatch(
+                          field: "harga_jual",
+                          value: hargaJual,
+                          batchId: _editMarginId!,
+                        );
 
-    if (_isEdit) {
+                        await editBatch(
+                          field: "profit",
+                          value: profit,
+                          batchId: _editMarginId!,
+                        );
 
-      // MODE EDIT
-      await editBatch(
-        field: "harga_jual",
-        value: hargaJual,
-        batchId: _editMarginId!,
-      );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Data berhasil diubah')),
+                        );
 
-      await editBatch(
-        field: "profit",
-        value: profit,
-        batchId: _editMarginId!,
-      );
+                        setState(() {
+                          _isEdit = false;
+                          _editMarginId = null;
+                        });
+                      } else {
+                        // MODE SIMPAN BARU
+                        await editBatch(
+                          field: "harga_jual",
+                          value: hargaJual,
+                          batchId: selectedBatch!,
+                        );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Data berhasil diubah'),
-        ),
-      );
+                        await editBatch(
+                          field: "profit",
+                          value: profit,
+                          batchId: selectedBatch!,
+                        );
 
-      setState(() {
-        _isEdit = false;
-        _editMarginId = null;
-      });
+                        await addExpense(
+                          "ongkos cuci",
+                          int.parse(ongkosCuciCtrl.text),
+                          selectedBatch!,
+                        );
 
-    } else {
+                        await addExpense(
+                          "ongkos kirim",
+                          int.parse(ongkosKirimCtrl.text),
+                          selectedBatch!,
+                        );
 
-      // MODE SIMPAN BARU
-      await editBatch(
-        field: "harga_jual",
-        value: hargaJual,
-        batchId: selectedBatch!,
-      );
+                        await addExpense(
+                          "biaya lain",
+                          int.parse(biayaLainCtrl.text),
+                          selectedBatch!,
+                        );
 
-      await editBatch(
-        field: "profit",
-        value: profit,
-        batchId: selectedBatch!,
-      );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Data berhasil disimpan'),
+                          ),
+                        );
+                      }
 
-      await addExpense(
-        "ongkos cuci",
-        int.parse(ongkosCuciCtrl.text),
-        selectedBatch!,
-      );
-
-      await addExpense(
-        "ongkos kirim",
-        int.parse(ongkosKirimCtrl.text),
-        selectedBatch!,
-      );
-
-      await addExpense(
-        "biaya lain",
-        int.parse(biayaLainCtrl.text),
-        selectedBatch!,
-      );
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Data berhasil disimpan'),
-        ),
-      );
-    }
-
-    await _loadMarginData();
-    _tabController.animateTo(1);
-  }
-},
-                  label: Text(
-  _isEdit ? 'Ubah' : 'Simpan',
-),
+                      await _loadMarginData();
+                      _tabController.animateTo(1);
+                    }
+                  },
+                  label: Text(_isEdit ? 'Ubah' : 'Simpan'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
@@ -839,419 +800,3 @@ void _showDeleteDialog(Map<String, dynamic> item) {
     );
   }
 }
-
-
-
-
-
-                  // onPressed: () async {
-                  //   if (_formKey.currentState!.validate()) {
-                      
-                  //     await editBatch(
-                  //       field: "harga_jual",
-                  //       value: hargaJual,
-                  //       batchId: selectedBatch!,
-                  //     );
-                  //     await editBatch(
-                  //       field: "profit",
-                  //       value: profit,
-                  //       batchId: selectedBatch!,
-                  //     );
-                  //     await addExpense(
-                  //       "ongkos cuci",
-                  //       int.parse(ongkosCuciCtrl.text),
-                  //       selectedBatch!,
-                  //     );
-                  //     await addExpense(
-                  //       "ongkos kirim",
-                  //       int.parse(ongkosKirimCtrl.text),
-                  //       selectedBatch!,
-                  //     );
-                  //     await addExpense(
-                  //       "biaya lain",
-                  //       int.parse(biayaLainCtrl.text),
-                  //       selectedBatch!,
-                  //     );
-
-                  //     // Refresh data margin
-                  //     await _loadMarginData();
-                  //     _tabController.animateTo(1);
-
-                  //     ScaffoldMessenger.of(context).showSnackBar(
-                  //       const SnackBar(content: Text('Data berhasil disimpan')),
-                  //     );
-                  //   }
-                  // },
-
-//                   label: Text(
-//   _isEdit ? 'Ubah' : 'Simpan',
-// ),
-//                   style: ElevatedButton.styleFrom(
-//                     backgroundColor: Colors.blue,
-//                     foregroundColor: Colors.white,
-//                     shape: RoundedRectangleBorder(
-//                       borderRadius: BorderRadius.circular(12),
-//                     ),
-//                     textStyle: const TextStyle(
-//                       fontSize: 15,
-//                       fontWeight: FontWeight.w500,
-//                     ),
-//                   ),
-//                 ),
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-
-
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //     body: SingleChildScrollView(
-  //       child: Padding(
-  //         padding: const EdgeInsets.all(16.0),
-  //         child: Form(
-  //           key: _formKey,
-  //           child: Column(
-  //             crossAxisAlignment: CrossAxisAlignment.start,
-  //             children: [
-  //               const Text(
-  //                 "Data Batch",
-  //                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-  //               ),
-  //               const SizedBox(height: 6),
-  //               DropdownButtonFormField<String>(
-  //                 value: selectedBatch,
-  //                 hint: const Text('Pilih Batch'),
-  //                 decoration: const InputDecoration(
-  //                   isDense: true,
-  //                   border: OutlineInputBorder(),
-  //                   contentPadding: EdgeInsets.symmetric(
-  //                     horizontal: 12,
-  //                     vertical: 12,
-  //                   ),
-  //                 ),
-  //                 items:
-  //                     batch
-  //                         .map(
-  //                           (b) => DropdownMenuItem(
-  //                             value: "${b["id"]}",
-  //                             child: Text(
-  //                               "${b['supplier']} - ${b['name']} - ${b['date']}",
-  //                               style: const TextStyle(fontSize: 14),
-  //                             ),
-  //                           ),
-  //                         )
-  //                         .toList(),
-  //                 validator:
-  //                     (value) =>
-  //                         value == null || value.isEmpty
-  //                             ? 'Pilih batch terlebih dahulu'
-  //                             : null,
-  //                 onChanged: (value) async {
-  //                   List<Map<String, dynamic>> temp = await getBatchDetails(
-  //                     value!,
-  //                   );
-  //                   int totalHarga = 0;
-  //                   if (temp.isNotEmpty) {
-  //                     for (var detail in temp) {
-  //                       if (detail['batch_id'] == value) {
-  //                         totalHarga +=
-  //                             int.tryParse(detail['harga'].toString()) ?? 0;
-  //                       }
-  //                     }
-  //                     print("Total Harga Beli: $totalHarga");
-  //                   }
-  //                   setState(() {
-  //                   selectedBatch = value;
-  //                     hargaBeli = totalHarga;
-  //                   });
-  //                 },
-  //               ),
-  //               const SizedBox(height: 20),
-
-  //               const Text(
-  //                 "Harga Jual (Rp)",
-  //                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-  //               ),
-  //               const SizedBox(height: 6),
-  //               TextFormField(
-  //                 controller: hargaJualCtrl,
-  //                 keyboardType: TextInputType.number,
-  //                 decoration: const InputDecoration(
-  //                   isDense: true,
-  //                   hintText: 'Masukkan Harga Jual',
-  //                   border: OutlineInputBorder(),
-  //                 ),
-  //                 validator: _validateAngka,
-  //               ),
-
-  //               SizedBox(height: 20),
-
-  //               const Text(
-  //                 "Ongkos Cuci (Rp)",
-  //                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-  //               ),
-  //               const SizedBox(height: 6),
-  //               TextFormField(
-  //                 controller: ongkosCuciCtrl,
-  //                 keyboardType: TextInputType.number,
-  //                 decoration: const InputDecoration(
-  //                   isDense: true,
-  //                   hintText: 'Masukkan Ongkos Cuci',
-  //                   border: OutlineInputBorder(),
-  //                 ),
-  //                 validator: _validateAngka,
-  //               ),
-  //               const SizedBox(height: 20),
-
-  //               const Text(
-  //                 "Ongkos Kirim (Rp)",
-  //                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-  //               ),
-  //               const SizedBox(height: 6),
-  //               TextFormField(
-  //                 controller: ongkosKirimCtrl,
-  //                 keyboardType: TextInputType.number,
-  //                 decoration: const InputDecoration(
-  //                   isDense: true,
-  //                   hintText: 'Masukkan Ongkos Kirim',
-  //                   border: OutlineInputBorder(),
-  //                 ),
-  //                 validator: _validateAngka,
-  //               ),
-  //               const SizedBox(height: 20),
-
-  //               const Text(
-  //                 "Biaya Lain (Rp)",
-  //                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-  //               ),
-  //               const SizedBox(height: 6),
-  //               TextFormField(
-  //                 controller: biayaLainCtrl,
-  //                 keyboardType: TextInputType.number,
-  //                 decoration: const InputDecoration(
-  //                   isDense: true,
-  //                   hintText: 'Masukkan Biaya Lain',
-  //                   border: OutlineInputBorder(),
-  //                 ),
-  //                 validator: _validateAngka,
-  //               ),
-  //               const SizedBox(height: 28),
-
-  //               if (selectedBatch != null)
-  //                 Column(
-  //                   mainAxisAlignment: MainAxisAlignment.start,
-  //                   crossAxisAlignment: CrossAxisAlignment.start,
-  //                   children: [
-  //                     const Text(
-  //                       "Perhitungan Margin",
-  //                       style: TextStyle(
-  //                         fontSize: 14,
-  //                         fontWeight: FontWeight.bold,
-  //                       ),
-  //                       textAlign: TextAlign.start,
-  //                     ),
-  //                     const SizedBox(height: 10),
-  //                     Container(
-  //                       width: double.infinity,
-  //                       decoration: BoxDecoration(
-  //                         border: Border.all(color: Colors.blue.shade200),
-  //                         borderRadius: BorderRadius.circular(8),
-  //                         color: Colors.blue.shade50,
-  //                       ),
-  //                       padding: const EdgeInsets.all(12),
-  //                       child: Column(
-  //                         mainAxisAlignment: MainAxisAlignment.start,
-  //                         crossAxisAlignment: CrossAxisAlignment.start,
-  //                         children: [
-  //                           Container(
-  //                             width: double.infinity,
-  //                             padding: const EdgeInsets.symmetric(
-  //                               horizontal: 10,
-  //                               vertical: 4,
-  //                             ),
-  //                             decoration: BoxDecoration(
-  //                               borderRadius: BorderRadius.circular(4),
-  //                               color: Colors.blue.shade700,
-  //                             ),
-  //                             child: const Text(
-  //                               "Total Biaya",
-  //                               style: TextStyle(
-  //                                 fontSize: 13,
-  //                                 fontWeight: FontWeight.bold,
-  //                                 color: Colors.white,
-  //                               ),
-  //                             ),
-  //                           ),
-  //                           const SizedBox(height: 10),
-  //                           // FIX 5: Gunakan getter totalBiaya
-  //                           Text("Total Biaya : Rp $totalBiaya"),
-
-  //                           const SizedBox(height: 15),
-
-  //                           const SizedBox(height: 15),
-  //                           Container(
-  //                             width: double.infinity,
-  //                             padding: const EdgeInsets.symmetric(
-  //                               horizontal: 10,
-  //                               vertical: 4,
-  //                             ),
-  //                             decoration: BoxDecoration(
-  //                               borderRadius: BorderRadius.circular(4),
-  //                               color: Colors.blue.shade700,
-  //                             ),
-  //                             child: const Text(
-  //                               "Harga Jual",
-  //                               style: TextStyle(
-  //                                 fontSize: 13,
-  //                                 fontWeight: FontWeight.bold,
-  //                                 color: Colors.white,
-  //                               ),
-  //                             ),
-  //                           ),
-  //                           const SizedBox(height: 10),
-  //                           Text("Harga Jual : Rp $hargaJual"),
-
-  //                           SizedBox(height: 15),
-
-  //                           const SizedBox(height: 15),
-  //                           Container(
-  //                             width: double.infinity,
-  //                             padding: const EdgeInsets.symmetric(
-  //                               horizontal: 10,
-  //                               vertical: 4,
-  //                             ),
-  //                             decoration: BoxDecoration(
-  //                               borderRadius: BorderRadius.circular(4),
-  //                               color: Colors.blue.shade700,
-  //                             ),
-  //                             child: const Text(
-  //                               "Harga Beli",
-  //                               style: TextStyle(
-  //                                 fontSize: 13,
-  //                                 fontWeight: FontWeight.bold,
-  //                                 color: Colors.white,
-  //                               ),
-  //                             ),
-  //                           ),
-  //                           const SizedBox(height: 10),
-  //                           Text("Harga Beli : Rp $hargaBeli"),
-  //                         ],
-  //                       ),
-  //                     ),
-  //                     const SizedBox(height: 10),
-  //                     Container(
-  //                       width: double.infinity,
-  //                       padding: const EdgeInsets.symmetric(
-  //                         horizontal: 14,
-  //                         vertical: 12,
-  //                       ),
-  //                       decoration: BoxDecoration(
-  //                         borderRadius: BorderRadius.circular(4),
-  //                         color: Colors.blue.shade700,
-  //                       ),
-  //                       child: Row(
-  //                         mainAxisAlignment: MainAxisAlignment.spaceAround,
-  //                         crossAxisAlignment: CrossAxisAlignment.center,
-  //                         children: [
-  //                           Column(
-  //                             mainAxisAlignment: MainAxisAlignment.center,
-  //                             crossAxisAlignment: CrossAxisAlignment.center,
-  //                             children: [
-  //                               const Text(
-  //                                 "Profit",
-  //                                 style: TextStyle(
-  //                                   color: Colors.white70,
-  //                                   fontSize: 12,
-  //                                 ),
-  //                               ),
-  //                               // FIX 6: Gunakan getter profit
-  //                               Text(
-  //                                 "Rp $profit",
-  //                                 style: const TextStyle(
-  //                                   color: Colors.white,
-  //                                   fontSize: 14,
-  //                                   fontWeight: FontWeight.bold,
-  //                                 ),
-  //                               ),
-  //                             ],
-  //                           ),
-  //                           Container(
-  //                             width: 1,
-  //                             height: 36,
-  //                             color: Colors.white38,
-  //                           ),
-  //                           Column(
-  //                             mainAxisAlignment: MainAxisAlignment.center,
-  //                             crossAxisAlignment: CrossAxisAlignment.center,
-  //                             children: [
-  //                               const Text(
-  //                                 "Margin",
-  //                                 style: TextStyle(
-  //                                   color: Colors.white70,
-  //                                   fontSize: 12,
-  //                                 ),
-  //                               ),
-  //                               // FIX 7: Gunakan getter marginPersen, format 2 desimal
-  //                               Text(
-  //                                 "${marginPersen.toStringAsFixed(2)}%",
-  //                                 style: const TextStyle(
-  //                                   color: Colors.white,
-  //                                   fontSize: 14,
-  //                                   fontWeight: FontWeight.bold,
-  //                                 ),
-  //                               ),
-  //                             ],
-  //                           ),
-  //                         ],
-  //                       ),
-  //                     ),
-  //                     const SizedBox(height: 20),
-  //                   ],
-  //                 ),
-
-  //               SizedBox(
-  //                 width: double.infinity,
-  //                 height: 50,
-  //                 child: ElevatedButton.icon(
-  //                   onPressed: () async {
-  //                     if (_formKey.currentState!.validate()) {
-  //                       await editBatch(field: "harga_jual", value: hargaJual, batchId: selectedBatch!);
-  //                       await editBatch(field: "profit", value: profit, batchId: selectedBatch!);
-  //                       await addExpense("ongkos cuci", int.parse(ongkosCuciCtrl.text), selectedBatch!);
-  //                       await addExpense("ongkos kirim", int.parse(ongkosKirimCtrl.text), selectedBatch!);
-  //                       await addExpense("biaya lain", int.parse(biayaLainCtrl.text), selectedBatch!);
-
-  //                        // Refresh data margin
-  //                        await _loadMarginData();
-  //                     }
-  //                   },
-                
-  //                   label: const Text('Simpan'),
-  //                   style: ElevatedButton.styleFrom(
-  //                     backgroundColor: Colors.blue,
-  //                     foregroundColor: Colors.white,
-  //                     shape: RoundedRectangleBorder(
-  //                       borderRadius: BorderRadius.circular(12),
-  //                     ),
-  //                     textStyle: const TextStyle(
-  //                       fontSize: 15,
-  //                       fontWeight: FontWeight.w500,
-  //                     ),
-  //                   ),
-  //                 ),
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  
-
